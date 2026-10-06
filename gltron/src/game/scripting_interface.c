@@ -7,6 +7,19 @@
 #include "lua.h"
 #include "lualib.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+EM_JS(void, web_quit, (void), {
+  if (Module.onQuit) Module.onQuit();
+});
+
+int c_webQuit(lua_State *L) {
+  web_quit();
+  return 0;
+}
+#endif
+
 int c_quitGame(lua_State *L) {
   saveSettings();
 	SystemExitLoop(RETURN_CREDITS);
@@ -133,4 +146,8 @@ void init_c_interface(void) {
 	
 	scripting_Register("SystemMainLoop", c_SystemMainLoop);
 	scripting_Register("SetCallback", c_SetCallback);
+#ifdef __EMSCRIPTEN__
+	scripting_Register("c_webQuit", c_webQuit);
+	scripting_Run("WEB = 1");
+#endif
 }

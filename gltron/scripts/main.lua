@@ -43,20 +43,38 @@ next_callback[ RETURN_TIMEDEMO_ABORT ] = nil
 next_callback[ RETURN_QUIT ] = nil
 
 
-while 1 do
-	SetCallback(callback)
-	-- write(format("[lua] setting callback '%s'\n", callback))
-	 
-	status = SystemMainLoop()
+-- picks the callback set to run after SystemMainLoop returns 'status'
+function MainLoopReturned(status)
 	-- write(format("[lua] system returned (%d)\n", status))
-	 
 	if(next_callback[ status ]) then
 		 callback = next_callback[ status ]
 	else
 		if(status == 10) then
 			write(format("[lua] unhandled callback (%d)\n", status))
-			exit()
+			if(WEB) then
+				-- a page can't exit; the host page decides what quitting means
+				c_webQuit()
+				callback = "gui"
+			else
+				exit()
+			end
 		end
 	end
+	if(WEB) then
+		SetCallback(callback)
+	end
 end
-			
+
+if(WEB) then
+	-- the browser calls back into MainLoopReturned once per loop exit
+	SetCallback(callback)
+	SystemMainLoop()
+else
+	while 1 do
+		SetCallback(callback)
+		-- write(format("[lua] setting callback '%s'\n", callback))
+	 
+		status = SystemMainLoop()
+		MainLoopReturned(status)
+	end
+end

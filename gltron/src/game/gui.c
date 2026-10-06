@@ -125,7 +125,9 @@ void displayConfigure(void) {
 void idleGui(void) {
 	Sound_idle();
 	scripting_RunGC();
+#ifndef __EMSCRIPTEN__
 	SDL_Delay(10);
+#endif
 	Video_Idle();
 	Input_Idle();
 	SystemPostRedisplay(); /* animate menu */

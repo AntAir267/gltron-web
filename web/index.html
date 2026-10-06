@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLtron</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #ccc; font: 14px monospace; }
+  #wrap { display: flex; align-items: center; justify-content: center; height: 100%; }
+  canvas { display: block; outline: none; }
+  #status { position: absolute; top: 8px; left: 8px; }
+</style>
+</head>
+<body>
+<div id="status">loading...</div>
+<div id="wrap"><canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas></div>
+<script>
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    print: function (t) { console.log(t); },
+    printErr: function (t) { console.warn(t); },
+    setStatus: function (t) { document.getElementById('status').textContent = t; },
+    onQuit: function () { console.log('[web] quit'); },
+  };
+</script>
+<script async src="gltron.js"></script>
+</body>
+</html>
