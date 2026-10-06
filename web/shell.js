@@ -37,16 +37,22 @@
     Module._web_resize(w, h);
   }
 
-  // Settings live in /prefs, backed by IndexedDB.
-  var saving = false;
-  function save() {
-    if (!ready || saving) return;
-    saving = true;
-    Module._web_save();
+  // Settings live in /prefs, backed by IndexedDB. GLtron writes them on
+  // every screen change (then calls onSettingsSaved) and when the tab hides.
+  var flushing = false, flushAgain = false;
+  function flush() {
+    if (flushing) { flushAgain = true; return; }
+    flushing = true;
     FS.syncfs(false, function (err) {
-      saving = false;
+      flushing = false;
       if (err) console.warn('[web] saving settings failed', err);
+      if (flushAgain) { flushAgain = false; flush(); }
     });
+  }
+  function save() {
+    if (!ready) return;
+    Module._web_save();
+    flush();
   }
 
   // Music: GLtron says what should play (web/port/SourceMusic.cpp), an
@@ -112,6 +118,7 @@
     print: function (t) { console.log(t); },
     printErr: function (t) { console.warn(t); },
     setStatus: setStatus,
+    onSettingsSaved: flush,
     onQuit: function () {
       save();
       if (opts.onQuit) opts.onQuit();

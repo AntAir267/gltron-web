@@ -61,6 +61,8 @@ function MainLoopReturned(status)
 		end
 	end
 	if(WEB) then
+		-- a page can be closed at any moment, so save on every screen change
+		c_webSave()
 		SetCallback(callback)
 	end
 end

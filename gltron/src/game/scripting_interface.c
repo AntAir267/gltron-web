@@ -18,6 +18,17 @@ int c_webQuit(lua_State *L) {
   web_quit();
   return 0;
 }
+
+EM_JS(void, web_flush_settings, (void), {
+  if (Module.onSettingsSaved) Module.onSettingsSaved();
+});
+
+/* save settings and have the page persist them (IndexedDB) */
+int c_webSave(lua_State *L) {
+  saveSettings();
+  web_flush_settings();
+  return 0;
+}
 #endif
 
 int c_quitGame(lua_State *L) {
@@ -148,6 +159,7 @@ void init_c_interface(void) {
 	scripting_Register("SetCallback", c_SetCallback);
 #ifdef __EMSCRIPTEN__
 	scripting_Register("c_webQuit", c_webQuit);
+	scripting_Register("c_webSave", c_webSave);
 	scripting_Run("WEB = 1");
 #endif
 }
