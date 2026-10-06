@@ -23,11 +23,7 @@ namespace Sound {
 
   void SourceSample::Load(char *filename) {
 #define BUFSIZE 1024 * 1024
-    SDL_RWops *rwops;
-
-    rwops = SDL_RWFromFile(filename, "rb");
-
-    Sound_Sample *sample = Sound_NewSample(rwops, NULL,
+    Sound_Sample *sample = Sound_NewSampleFromFile(filename,
 					   _system->GetAudioInfo(),
 					   _buffersize );
     if(sample == NULL) {

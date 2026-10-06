@@ -18,6 +18,10 @@ static Sound::SourceSample *sample_recognizer = NULL;
 static Sound::Source3D *players[PLAYERS];
 static Sound::Source3D *recognizerEngine;
 
+#ifdef __EMSCRIPTEN__
+extern "C" int web_audio_muted; /* set by the host page, see web/port/web.c */
+#endif
+
 #define TURNLENGTH 250.0f
 
 static void output_decoders(void)
@@ -141,7 +145,11 @@ extern "C" {
     listener._up = Vector3(0, 0, 1);
 
     sound->SetMixMusic(gSettingsCache.playMusic);
+#ifdef __EMSCRIPTEN__
+    sound->SetMixFX(gSettingsCache.playEffects && !web_audio_muted);
+#else
     sound->SetMixFX(gSettingsCache.playEffects);
+#endif
     sound->Idle();
   }
 

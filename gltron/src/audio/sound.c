@@ -40,7 +40,11 @@ void Sound_reloadTrack(void) {
 	scripting_GetGlobal("settings", "current_track", NULL);
   scripting_GetStringResult(&song);
   fprintf(stderr, "[sound] loading song %s\n", song);
+#ifdef __EMSCRIPTEN__
+  path = getPossiblePath( PATH_MUSIC, song );
+#else
   path = getPath( PATH_MUSIC, song );
+#endif
   free(song);
   if(path == NULL) {
     fprintf(stderr, "[sound] can't find song...exiting\n");
@@ -87,6 +91,32 @@ void Sound_setFxVolume(float volume) {
   Audio_SetFxVolume(volume);
 }
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+/* the page's track list, one file name per line */
+EM_JS(char*, web_music_tracks, (void), {
+  var names = (Module.music && Module.music.tracks) ? Module.music.tracks() : [];
+  return stringToNewUTF8(names.join("\n"));
+});
+
+void Sound_initTracks(void) {
+  char *names = web_music_tracks();
+  char *name;
+  int i = 1;
+
+  for(name = strtok(names, "\n"); name != NULL; name = strtok(NULL, "\n")) {
+    scripting_RunFormat("tracks[%d] = \"%s\"", i, name);
+    i++;
+  }
+  free(names);
+  if(i == 1) {
+    /* no music: keep the Song menu working */
+    scripting_Run("tracks[1] = \"none\"");
+  }
+  scripting_Run("setupSoundTrack()");
+}
+#else
 void Sound_initTracks(void) {
   const char *music_path;
   List *soundList;
@@ -113,6 +143,7 @@ void Sound_initTracks(void) {
   }
   scripting_Run("setupSoundTrack()");
 }
+#endif
 
 void Sound_setup(void) {
   printf("[sound] initializing sound\n");
