@@ -144,6 +144,7 @@ printf 'window.GLTRON_MUSIC = { base: "music/", tracks: [%s] };\n' \
   "$(IFS=,; echo "${tracks[*]}")" > "$DIST/music/tracks.js"
 
 # ---- link --------------------------------------------------------------------
+rm -f "$DIST"/gltron.*
 em++ "${OPT[@]}" "${LINK_OPT[@]}" "${PORTS[@]}" "${objs[@]}" "$GL4ES/lib/libGL.a" \
   -sFULL_ES2=1 -sALLOW_MEMORY_GROWTH=1 -sEXIT_RUNTIME=0 \
   -sEXPORTED_RUNTIME_METHODS=callMain,FS,ENV \
