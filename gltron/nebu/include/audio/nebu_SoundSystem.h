@@ -38,6 +38,7 @@ namespace Sound {
     Sound_AudioInfo* GetAudioInfo() { return &_info; };
     Listener& GetListener() { return _listener; };
     void SetMixMusic(int value) { _mix_music = value; };
+    int GetMixMusic() { return _mix_music; };
     void SetMixFX(int value) { _mix_fx = value; };
     void SetStatus(int eStatus) { _status = eStatus; };
 

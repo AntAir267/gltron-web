@@ -77,6 +77,11 @@ settings.screenSaver = 0
 
 settings.joy_threshold = 0.10
 
+if(WEB) then
+	-- WebGL always has a stencil buffer, so shadows can be translucent
+	settings.use_stencil = 1
+end
+
 -- audio
 settings.tracks = { }
 settings.current_track = "revenge_of_cats.it"
