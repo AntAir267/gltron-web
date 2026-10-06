@@ -19,7 +19,7 @@ float getDist(segment2 *s, float* eye) {
   n[1] = s->vStart.v[1] - s->vDirection.v[0];
   tmp[0] = eye[0] - s->vStart.v[0];
   tmp[1] = eye[1] - s->vStart.v[1];
-  if(n[0] == n[1] == 0) return length(tmp);
+  if(n[0] == 0 && n[1] == 0) return length(tmp);
   return abs(scalarprod2(n, tmp) / length(n));
 }
 
@@ -81,8 +81,6 @@ void drawTrailLines(Player *p, PlayerVisual *pV) {
   float height;
 
   float *normal;
-  float dist;
-  float alpha;
   Data *data;
   Camera *cam;
 
@@ -113,8 +111,8 @@ void drawTrailLines(Player *p, PlayerVisual *pV) {
   while(s != data->trails + data->trailOffset) { 
 		/* the current line is not drawn */
     /* compute distance from line to eye point */
-    dist = getDist(s, cam->cam);
-		alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
+    getDist(s, cam->cam);
+//		alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
     // trail_top[3] = alpha;
     glColor4fv(trail_top);
     
@@ -133,8 +131,8 @@ void drawTrailLines(Player *p, PlayerVisual *pV) {
   glEnd();
 
   /* compute distance from line to eye point */
-  dist = getDist(s, cam->cam);
-  alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
+  getDist(s, cam->cam);
+  //alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
 	// trail_top[3] = alpha;
   glColor4fv(trail_top);
 

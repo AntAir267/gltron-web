@@ -1,0 +1,14 @@
+Bug-Debian: http://bugs.debian.org/408695
+Description: Disable changing the screen resolution in-game, since it was
+ crashing anyway
+--- gltron-0.70final.orig/scripts/menu.lua
++++ gltron-0.70final/scripts/menu.lua
+@@ -557,7 +557,7 @@ Menu.Player4_KeyMenu.items = {
+ 
+ Menu.VideoMenu.items = {
+ 	 "Artpack", "DetailsMenu", 
+-	 "ScreenMenu" --, "TimeDemo" 
++	 --"ScreenMenu" --, "TimeDemo" 
+ }
+ 
+ Menu.DetailsMenu.items = {

@@ -1,0 +1,13 @@
+Description: fix compile error on gcc 3.0+
+--- gltron-0.70final.orig/lua/src/lib/liolib.c
++++ gltron-0.70final/lua/src/lib/liolib.c
+@@ -8,7 +8,7 @@
+ 
+ #include <ctype.h>
+ #include <stdio.h>
+-#define __USE_MISC /* for mkstemp() */
++/*#define __USE_MISC */ /* for mkstemp() */
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
+ 

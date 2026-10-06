@@ -156,11 +156,10 @@ int scripting_GetStringResult(char **s) {
 int scripting_CopyStringResult(char *s, int len) {
   int status;
   if(lua_isstring(L, -1)) {
-    int size, copy;
+    int size;
     status = 0;
     size = lua_strlen(L, -1) + 1;
-    if(size > len) { copy = len; status = 2; }
-    else copy = size;
+    if(size > len) { status = 2; }
     memcpy( s, lua_tostring(L, -1), size );
   } else
     status = 1;
@@ -169,16 +168,16 @@ int scripting_CopyStringResult(char *s, int len) {
   return status;
 }    
 
-void scripting_RunFile(char *name) {
+void scripting_RunFile(const char *name) {
   lua_dofile(L, name);
 }
 
-void scripting_Run(char *command) {
+void scripting_Run(const char *command) {
   /* fprintf(stderr, "[command] %s\n", command); */
   lua_dostring(L, command);
 }
 
-void scripting_RunFormat(char *format, ... ) {
+void scripting_RunFormat(const char *format, ... ) {
   char buf[4096];
   va_list ap;
   va_start(ap, format);

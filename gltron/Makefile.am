@@ -4,7 +4,7 @@ bin_PROGRAMS = gltron
 
 gltron_SOURCES = @top_srcdir@/src/gltron.c
 
-gltron_LINK = $(CXX) -o $@
+gltron_LINK = $(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
 gltron_LDADD = \
 	src/game/libgame.a \
 	src/input/libinput.a \
