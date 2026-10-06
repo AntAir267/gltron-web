@@ -1,0 +1,109 @@
+Description: Fix build issues with gcc 4.6
+Author: Peter Green (plugwash@p10link.net)
+Bug-Debian: http://bugs.debian.org/625343
+
+--- gltron-0.70final.orig/src/game/computer.c
++++ gltron-0.70final/src/game/computer.c
+@@ -27,11 +27,10 @@ AI_Parameters ai_params = {
+ void doComputerSimple(int player, int target, AI_Distances *distances) {
+   AI *ai;
+   Data *data;
+-  Player *me, *him;
++  Player *me;
+   int level;
+ 
+   me = &(game->player[ player ]);
+-  him = &(game->player[ target ]);
+   if(me->ai == NULL) {
+     printf("This player has no AI data!\n");
+     return;
+--- gltron-0.70final.orig/src/game/init_sdl.c
++++ gltron-0.70final/src/game/init_sdl.c
+@@ -27,7 +27,6 @@ void inputInit(void) {
+ 	/* joystick */
+ 	if(SDL_Init(SDL_INIT_JOYSTICK) >= 0) {
+ 		int i;
+-		SDL_Joystick *joy;
+ 		int joysticks = SDL_NumJoysticks();
+ 
+ 		/* FIXME: why only two joysticks? */
+@@ -36,7 +35,7 @@ void inputInit(void) {
+ 			joysticks = 2;
+ 		
+ 		for(i = 0; i < joysticks; i++) {
+-			joy = SDL_JoystickOpen(i);
++			SDL_JoystickOpen(i);
+ 		}
+ 		if(i)
+ 			SDL_JoystickEventState(SDL_ENABLE);
+--- gltron-0.70final.orig/src/video/trail.c
++++ gltron-0.70final/src/video/trail.c
+@@ -81,8 +81,6 @@ void drawTrailLines(Player *p, PlayerVis
+   float height;
+ 
+   float *normal;
+-  float dist;
+-  float alpha;
+   Data *data;
+   Camera *cam;
+ 
+@@ -113,8 +111,8 @@ void drawTrailLines(Player *p, PlayerVis
+   while(s != data->trails + data->trailOffset) { 
+ 		/* the current line is not drawn */
+     /* compute distance from line to eye point */
+-    dist = getDist(s, cam->cam);
+-		alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
++    getDist(s, cam->cam);
++//		alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
+     // trail_top[3] = alpha;
+     glColor4fv(trail_top);
+     
+@@ -133,8 +131,8 @@ void drawTrailLines(Player *p, PlayerVis
+   glEnd();
+ 
+   /* compute distance from line to eye point */
+-  dist = getDist(s, cam->cam);
+-  alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
++  getDist(s, cam->cam);
++  //alpha = (game2->rules.grid_size - dist / 2) / game2->rules.grid_size;
+ 	// trail_top[3] = alpha;
+   glColor4fv(trail_top);
+ 
+--- gltron-0.70final.orig/nebu/scripting/scripting.c
++++ gltron-0.70final/nebu/scripting/scripting.c
+@@ -156,11 +156,10 @@ int scripting_GetStringResult(char **s)
+ int scripting_CopyStringResult(char *s, int len) {
+   int status;
+   if(lua_isstring(L, -1)) {
+-    int size, copy;
++    int size;
+     status = 0;
+     size = lua_strlen(L, -1) + 1;
+-    if(size > len) { copy = len; status = 2; }
+-    else copy = size;
++    if(size > len) { status = 2; }
+     memcpy( s, lua_tostring(L, -1), size );
+   } else
+     status = 1;
+--- gltron-0.70final.orig/nebu/video/video_system.c
++++ gltron-0.70final/nebu/video/video_system.c
+@@ -19,7 +19,7 @@ void SystemInitWindow(int x, int y, int
+ }
+ 
+ void SystemInitDisplayMode(int f, unsigned char full) {
+-  int bitdepth, zdepth;
++  int zdepth;
+ 
+   flags = f;
+   fullscreen = full;
+@@ -34,10 +34,8 @@ void SystemInitDisplayMode(int f, unsign
+ 
+   if(flags & SYSTEM_32_BIT) {
+     zdepth = 24;
+-    bitdepth = 32;
+   } else {
+     zdepth = 16;
+-    bitdepth = 16;
+   }
+   if(flags & SYSTEM_DEPTH)
+     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, zdepth);

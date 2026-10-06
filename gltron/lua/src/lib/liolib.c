@@ -8,7 +8,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
-#define __USE_MISC /* for mkstemp() */
+/*#define __USE_MISC */ /* for mkstemp() */
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>

@@ -1,0 +1,79 @@
+Description: Make configure & Makefiles use CFLAGS/CXXFLAGS correctly
+ Remove broken --enable-optimize flag from configure, since it
+ was overriding our CFLAGS. Also update configure.in to work with newer
+ autoconf without NEWS/AUTHORS.
+Index: gltron-0.70final/configure.in
+===================================================================
+--- gltron-0.70final.orig/configure.in
++++ gltron-0.70final/configure.in
+@@ -1,10 +1,11 @@
+ dnl Process this file with autoconf to produce a configure script.
+ 
+ dnl initialisation
+-AC_INIT(src/gltron.c)
++AC_INIT([gltron], [0.70])
++AC_CONFIG_SRCDIR([src/gltron.c])
+ AC_CANONICAL_HOST
+ AC_CANONICAL_TARGET
+-AM_INIT_AUTOMAKE(gltron, 0.70)
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_PREFIX_DEFAULT("/usr/local")
+ 
+@@ -16,11 +17,7 @@ AC_PROG_CXX
+ AC_PROG_CPP
+ AC_PROG_RANLIB
+ 
+-dnl CFLAGS set-up
+-CFLAGS="-DSEPARATOR=\"'/'\"" 
+-dnl CFLAGS="-ansi -pedantic"
+-dnl CXXFLAGS=""
+-dnl CPPFLAGS=""
++CFLAGS="$CFLAGS -DSEPARATOR=\"'/'\""
+ 
+ AC_ARG_ENABLE(warn,
+ AC_HELP_STRING([--enable-warn],[Enable compiler warnings @<:@default=on@:>@]),
+@@ -48,15 +45,6 @@ if test "x$enable_profile" = xyes; then
+ 	fi
+ fi
+ 
+-AC_ARG_ENABLE(optimize,
+-AC_HELP_STRING([--enable-optimize=@<:@level@:>@],[Enable optimization @<:@default=s@:>@]),
+-	enable_optmize=$enableval, enable_optimize=s)
+-dnl this is always true
+-if test "x$enable_optimize" ; then
+-	CFLAGS="$CFLAGS -O$enable_optimize"
+-	CXXFLAGS="$CXXFLAGS -O$enable_optimize"
+-fi
+-
+ dnl library checks
+ AM_PATH_SDL(1.1.0, CFLAGS="$CFLAGS $SDL_CFLAGS"; CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"; LIBS="$LIBS $SDL_LIBS",
+ 	AC_MSG_ERROR(SDL is not installed))
+Index: gltron-0.70final/Makefile.am
+===================================================================
+--- gltron-0.70final.orig/Makefile.am
++++ gltron-0.70final/Makefile.am
+@@ -4,7 +4,7 @@ bin_PROGRAMS = gltron
+ 
+ gltron_SOURCES = @top_srcdir@/src/gltron.c
+ 
+-gltron_LINK = $(CXX) -o $@
++gltron_LINK = $(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+ gltron_LDADD = \
+ 	src/game/libgame.a \
+ 	src/input/libinput.a \
+Index: gltron-0.70final/lua/src/lib/Makefile.am
+===================================================================
+--- gltron-0.70final.orig/lua/src/lib/Makefile.am
++++ gltron-0.70final/lua/src/lib/Makefile.am
+@@ -1,9 +1,6 @@
+ noinst_LIBRARIES=liblualib.a
+ 
+-DEFS=
+-CPPFLAGS=
+-CFLAGS=-ansi -pedantic -Wall -I$(srcdir)/.. -I$(top_srcdir)/lua/include
+-LDFLAGS=
++AM_CFLAGS=-ansi -pedantic -Wall -I$(srcdir)/.. -I$(top_srcdir)/lua/include
+ LIBS=-lm
+ 
+ liblualib_a_SOURCES=lauxlib.c lbaselib.c ldblib.c liolib.c lmathlib.c lstrlib.c

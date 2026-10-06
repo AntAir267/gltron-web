@@ -27,11 +27,10 @@ AI_Parameters ai_params = {
 void doComputerSimple(int player, int target, AI_Distances *distances) {
   AI *ai;
   Data *data;
-  Player *me, *him;
+  Player *me;
   int level;
 
   me = &(game->player[ player ]);
-  him = &(game->player[ target ]);
   if(me->ai == NULL) {
     printf("This player has no AI data!\n");
     return;

@@ -27,7 +27,6 @@ void inputInit(void) {
 	/* joystick */
 	if(SDL_Init(SDL_INIT_JOYSTICK) >= 0) {
 		int i;
-		SDL_Joystick *joy;
 		int joysticks = SDL_NumJoysticks();
 
 		/* FIXME: why only two joysticks? */
@@ -36,7 +35,7 @@ void inputInit(void) {
 			joysticks = 2;
 		
 		for(i = 0; i < joysticks; i++) {
-			joy = SDL_JoystickOpen(i);
+			SDL_JoystickOpen(i);
 		}
 		if(i)
 			SDL_JoystickEventState(SDL_ENABLE);

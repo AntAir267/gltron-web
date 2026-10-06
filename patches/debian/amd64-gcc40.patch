@@ -1,0 +1,25 @@
+Bug-Debian: http://bugs.debian.org/286782
+Author: Andreas Jochens
+Description: Fix a compile problem on amd64 with gcc 4.0+.
+--- gltron-0.70final.orig/src/video/trail.c
++++ gltron-0.70final/src/video/trail.c
+@@ -19,7 +19,7 @@ float getDist(segment2 *s, float* eye) {
+   n[1] = s->vStart.v[1] - s->vDirection.v[0];
+   tmp[0] = eye[0] - s->vStart.v[0];
+   tmp[1] = eye[1] - s->vStart.v[1];
+-  if(n[0] == n[1] == 0) return length(tmp);
++  if(n[0] == 0 && n[1] == 0) return length(tmp);
+   return abs(scalarprod2(n, tmp) / length(n));
+ }
+ 
+--- gltron-0.70final.orig/src/include/video/fonttex.h
++++ gltron-0.70final/src/include/video/fonttex.h
+@@ -10,7 +10,7 @@ typedef struct {
+   int lower; /* lowest ascii character (normally: 32) */
+   int upper; /* highest ascii character (normally: 126) */
+ 
+-  int *texID;
++  unsigned int *texID;
+ 
+   char *fontname;
+   char *bitmapname;

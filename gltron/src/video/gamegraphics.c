@@ -376,7 +376,7 @@ void drawCam(Player *p, PlayerVisual* pV) {
     int lod = playerVisible(p, game->player + i);
 		if (lod >= 0) {
 			int drawTurn = 1;
-			if (! gSettingsCache.camType == CAM_TYPE_COCKPIT ||
+			if (! (gSettingsCache.camType == CAM_TYPE_COCKPIT) ||
 	 			p != &game->player[i])
 				drawTurn = 0;
 			drawCycleShadow(gPlayerVisuals + i, game->player + i, lod, drawTurn);

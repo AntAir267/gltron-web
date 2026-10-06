@@ -19,7 +19,7 @@ void SystemInitWindow(int x, int y, int w, int h) {
 }
 
 void SystemInitDisplayMode(int f, unsigned char full) {
-  int bitdepth, zdepth;
+  int zdepth;
 
   flags = f;
   fullscreen = full;
@@ -34,10 +34,8 @@ void SystemInitDisplayMode(int f, unsigned char full) {
 
   if(flags & SYSTEM_32_BIT) {
     zdepth = 24;
-    bitdepth = 32;
   } else {
     zdepth = 16;
-    bitdepth = 16;
   }
   if(flags & SYSTEM_DEPTH)
     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, zdepth);

@@ -1,0 +1,11 @@
+amd64-ai.patch
+amd64-gcc40.patch
+cflags.patch
+disable-screenmenu.patch
+gcc30.patch
+gcc-4.6.patch
+fix-clang-build.patch
+fix-prototypes.patch
+automake-error.patch
+gcc5.diff
+no-Werror.patch
