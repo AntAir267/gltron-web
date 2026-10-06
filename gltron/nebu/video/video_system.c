@@ -3,6 +3,10 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 
+#ifdef __EMSCRIPTEN__
+#include "gl4esinit.h"
+#endif
+
 static SDL_Surface *screen;
 static int width, height;
 static int flags;
@@ -59,6 +63,16 @@ int SystemCreateWindow(char *name) {
     fprintf(stderr, "[system] Couldn't set GL mode: %s\n", SDL_GetError());
     exit(1); /* OK: critical, no visual */
   }
+#ifdef __EMSCRIPTEN__
+  {
+    /* gl4es turns the OpenGL 1.x calls into WebGL; it needs the context */
+    static int gl4es_ready = 0;
+    if(!gl4es_ready) {
+      initialize_gl4es();
+      gl4es_ready = 1;
+    }
+  }
+#endif
   SDL_WM_SetCaption("GLtron", "");
   glClearColor(0,0,0,0);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -67,6 +81,10 @@ int SystemCreateWindow(char *name) {
 }
 
 void SystemDestroyWindow(int id) {
+#ifdef __EMSCRIPTEN__
+  /* keep the one WebGL context; SystemCreateWindow just resizes it */
+  return;
+#endif
   /* quit the video subsytem
 	 * otherwise SDL can't create a new context on win32, if the stencil
 	 * bits change 

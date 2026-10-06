@@ -32,8 +32,12 @@ char *credits[] = {
 void mouseCredits (int buttons, int state, int x, int y)
 {
 	if ( state == SYSTEM_MOUSEPRESSED ) {
+#ifdef __EMSCRIPTEN__
+		SystemExitLoop(RETURN_QUIT);
+#else
 		SystemExit();
 		exit(0);
+#endif
 	}
 }
 
@@ -41,8 +45,12 @@ void keyCredits(int state, int k, int x, int y)
 {
 	if(state == SYSTEM_KEYSTATE_UP)
 		return;
+#ifdef __EMSCRIPTEN__
+	SystemExitLoop(RETURN_QUIT);
+#else
   SystemExit();
 	exit(0);
+#endif
 }
 
 void idleCredits(void) {

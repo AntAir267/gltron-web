@@ -14,7 +14,7 @@
 #endif
 
 void randomPermutation( int N, int *nodes );
-void clamp( float *f, float min, float max );
+void nebu_clamp( float *f, float min, float max );
 void addList(List **l, void* data);
 
 #endif
