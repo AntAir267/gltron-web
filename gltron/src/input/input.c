@@ -121,14 +121,15 @@ void keyGame(int state, int k, int x, int y)
 		}
 	}
 #ifdef __EMSCRIPTEN__
-	/* Keys no player has bound: the arrows also steer the first human player
-	   (Left/Right turn, Up boosts) and C cycles the camera like F10. */
+	/* Keys no human player has bound: the arrows and GLtron's classic
+	   player 1 letters (A/S turn, E boosts) steer the first human player,
+	   and C cycles the camera like F10. */
 	{
 		const char *action = NULL;
 		switch(k) {
-		case SYSTEM_KEY_LEFT: action = "left"; break;
-		case SYSTEM_KEY_RIGHT: action = "right"; break;
-		case SYSTEM_KEY_UP: action = "boost"; break;
+		case SYSTEM_KEY_LEFT: case 'a': action = "left"; break;
+		case SYSTEM_KEY_RIGHT: case 's': action = "right"; break;
+		case SYSTEM_KEY_UP: case 'e': action = "boost"; break;
 		case 'c':
 			if(state == SYSTEM_KEYSTATE_DOWN)
 				nextCameraType();

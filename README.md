@@ -77,13 +77,19 @@ the tree still builds natively.
   can't be read from C).
 - Players 3 and 4 get web key codes for their default arrow/keypad keys:
   Emscripten's SDL numbers those keys differently from SDL 1.2.
-- **Mouse look is off.** GLtron's mouse look measures each move from a fixed
-  point and warps the pointer back there. Pages can't move the pointer, so the
-  offsets piled up and spun the camera. The web build ignores mouse movement
-  in the race; `C` cycles camera views instead.
-- **Extra keys:** unbound arrow keys steer the first human player (Left/Right
-  turn, Up boosts) and `C` cycles the camera. Because the arrows steer, the
-  in-race console scrolls with PageUp/PageDown.
+- **Mouse look and click zoom are off.** GLtron's mouse look measures each move
+  from a fixed point and warps the pointer back there. Pages can't move the
+  pointer, so the offsets piled up and spun the camera. Holding a mouse button
+  zoomed the camera, so every click to focus the page zoomed out. The web
+  build ignores the mouse in the race; `C` cycles camera views instead.
+- **No key repeat**, as in native GLtron (`SDL_EnableKeyRepeat(0, 0)`):
+  Emscripten's SDL passes the browser's repeats on, so a held key turned the
+  bike or cycled the camera over and over. `shell.js` drops them.
+- **Keys:** player 1 defaults to the arrows (Up boosts, Delete/End glance) and
+  player 3 to GLtron's old player 1 letters; settings saved before this get
+  the new defaults once. Unbound arrows and A/S/E steer the first human
+  player, and `C` cycles the camera. The in-race console scrolls with
+  PageUp/PageDown.
 - **Key names:** Emscripten's SDL only names a-z and 0-9, and numbers arrows,
   F-keys and the keypad above GLtron's joystick codes, so Configure Keys showed
   blanks and "unknown custom key". `web/port/sdl_compat.c` names every key.
@@ -125,11 +131,11 @@ starts on the first key press or click.
 
 ## Controls
 
-Player 1 turns with `A` / `S` or the Left / Right arrows, boosts with `D` or
-Up, and looks around with `Q` / `W`. `C` (or `F10`) cycles the camera views.
-`Space` pauses, `Esc` opens the menu, and `F1`–`F4` switch between single and
-split-screen layouts. The arrows and `C` only do this while no player has them
-bound.
+Player 1 turns with the Left / Right arrows, boosts with Up, and looks around
+with `Delete` / `End`. GLtron's own player 1 letters work too while no human
+player has them: `A` / `S` turn and `E` boosts (they belong to player 3 in the
+web build). `C` (or `F10`) cycles the camera views, `Space` pauses, `Esc` opens
+the menu, and `F1`–`F4` switch between single and split-screen layouts.
 Players 2–4 are configurable in Game → Configure Keys.
 
 On touch screens, on-screen controls appear by themselves and hide again when

@@ -131,17 +131,38 @@ settings.keys = {
 }
 
 if(WEB) then
-	-- Emscripten's SDL numbers arrow, End and keypad keys differently from
-	-- SDL 1.2 (scancode + 1024), so the defaults above wouldn't match
-	settings.keys[3].left = 1104 -- cursor left
-	settings.keys[3].right = 1103 -- cursor right
-	settings.keys[3].glance_right = 1101 -- 'end'
-	settings.keys[3].boost = 1105 -- cursor down
+	-- On the web player 1 gets the arrow keys (Up boosts) and player 3 the
+	-- letters player 1 had. Emscripten's SDL numbers arrow, End and keypad
+	-- keys differently from SDL 1.2 (scancode + 1024).
+	settings.keys[1] = {
+		left = 1104, -- cursor left
+		right = 1103, -- cursor right
+		glance_left = 127, -- 'del'
+		glance_right = 1101, -- 'end'
+		boost = 1106, -- cursor up
+	}
+	settings.keys[3] = {
+		left = 97, -- lower case 'a'
+		right = 115, -- lower case 's'
+		glance_left = 113, -- lower case 'q'
+		glance_right = 119, -- lower case 'w'
+		boost = 101, -- lower case 'e'
+	}
 	settings.keys[4].left = 1116 -- keypad 4
 	settings.keys[4].right = 1118 -- keypad 6
 	settings.keys[4].glance_left = 1119 -- keypad 7
 	settings.keys[4].glance_right = 1121 -- keypad 9
 	settings.keys[4].boost = 1117 -- keypad 5
+	web_default_keys = settings.keys
+
+	-- after the settings file loads (init.c): saves from before this
+	-- version get the new key defaults once
+	function web_update_settings()
+		if(settings.web_keys ~= 2) then
+			settings.keys = web_default_keys
+			settings.web_keys = 2
+		end
+	end
 end
 
 -- these tables are not serialized to RCNAME (yet)

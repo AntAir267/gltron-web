@@ -244,6 +244,17 @@
     }],
   };
 
+  // GLtron turns key repeat off (SDL_EnableKeyRepeat(0, 0) in init_sdl.c),
+  // but Emscripten's SDL passes the browser's repeats on: a held key would
+  // turn the bike or cycle the camera over and over. Drop them before SDL
+  // (which listens on the document) sees them.
+  window.addEventListener('keydown', function (e) {
+    if (e.repeat) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, true);
+
   window.addEventListener('error', function () {
     setStatus('Something went wrong. Reload to try again.');
   });
