@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 /*
   gltron
   Copyright (C) 1999 by Andreas Umbach <marvin@dataway.ch>

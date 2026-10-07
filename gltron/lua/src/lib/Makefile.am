@@ -1,3 +1,4 @@
+# Modified by Debian's gltron package patches (see patches/debian/).
 noinst_LIBRARIES=liblualib.a
 
 AM_CFLAGS=-ansi -pedantic -Wall -I$(srcdir)/.. -I$(top_srcdir)/lua/include

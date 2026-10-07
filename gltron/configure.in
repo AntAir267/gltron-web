@@ -1,3 +1,4 @@
+dnl Modified by Debian's gltron package patches (see patches/debian/).
 dnl Process this file with autoconf to produce a configure script.
 
 dnl initialisation

@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 #include "nebu_scripting.h"
 
 #include "lua.h"

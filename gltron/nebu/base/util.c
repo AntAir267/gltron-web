@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 /* small utility functions */
 
 #include <stdlib.h>

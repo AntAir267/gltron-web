@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "audio/nebu_SourceSample.h"
 
 #include <assert.h>

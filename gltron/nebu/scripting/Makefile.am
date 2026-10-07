@@ -1,3 +1,4 @@
+# Modified by Debian's gltron package patches (see patches/debian/).
 noinst_LIBRARIES=libscripting.a
 
 libscripting_a_SOURCES= \

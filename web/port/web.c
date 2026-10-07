@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later
+   Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron. */
 /* Entry points the host page calls into (see web/shell.js). */
 #include "game/gltron.h"
 

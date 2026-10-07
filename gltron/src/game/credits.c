@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "game/gltron.h"
 
 static int coffset;
@@ -10,10 +11,11 @@ char *credits[] = {
   " Programming: Darrell Walisser  Nicolas Deniaud",
   "              Todd Kirby  Andy Howe  Jon Atkins",
   " Art:         Nicolas Zimmermann",
-  "              Charles Babbage       Tracy Brown"
+  "              Charles Babbage       Tracy Brown",
   "              Tyler Esselstrom       Allen Bond",
   " Music:       Peter Hajba",
   " Sound:       Damon Law",
+  " Web port:    Anthony Airdo",
   "",
   "Additional Thanks to:",
   "Xavier Bouchoux     Mike Field      Steve Baker",
@@ -26,6 +28,10 @@ char *credits[] = {
   "Thanks to my sponsors:",
   "  3dfx:              Voodoo5 5500 graphics card",
   "  Right Hemisphere:  3D exploration software",
+#ifdef __EMSCRIPTEN__
+  "",
+  "Source: github.com/AntAir267/gltron-web",
+#endif
   NULL
 };
 
@@ -63,6 +69,7 @@ void drawCredits(void) {
   int x, y;
   int h;
   int i;
+  int n;
   float colors[][3] = { { 1.0, 0.0, 0.0 }, { 1.0, 1.0, 1.0 } };
   time = SystemGetElapsedTime() - coffset;
 
@@ -70,7 +77,11 @@ void drawCredits(void) {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   rasonly(gScreen);
-  h = gScreen->vp_h / (24 * 3 / 2);
+  /* fit the whole list, but never larger than the original 24 rows */
+  for(n = 0; credits[n] != NULL; n++);
+  if(n < 23)
+    n = 23;
+  h = 2 * gScreen->vp_h / (3 * (n + 1));
   for(i = 0; i < time / 250; i++) {
     glColor3fv(colors[i % 2]);
     if(credits[i] == NULL) 

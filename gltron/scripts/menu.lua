@@ -1,3 +1,4 @@
+-- Modified by Debian's gltron package patches (see patches/debian/).
 MenuC = {
    type = {
       menu = 1,

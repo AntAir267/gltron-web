@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 #include "game/gltron.h"
 
 static int startTime = 0;

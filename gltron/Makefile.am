@@ -1,3 +1,4 @@
+# Modified by Debian's gltron package patches (see patches/debian/).
 SUBDIRS = lua nebu src art data music scripts
 
 bin_PROGRAMS = gltron

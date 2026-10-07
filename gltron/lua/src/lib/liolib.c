@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 /*
 ** $Id: liolib.c,v 1.6 2003/06/30 19:15:26 ahowe Exp $
 ** Standard I/O (and system) library

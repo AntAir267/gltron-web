@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron.
 // Host-page glue for gltron.js: canvas sizing, loading status, saved
 // settings, streamed music and the mute switch.
 //
