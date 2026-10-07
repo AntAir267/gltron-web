@@ -145,8 +145,12 @@ void initData(void) {
 	game2->events.next = NULL;
 	/* TODO: free any old events that might have gotten left */
 
-  resetVideoData();
+	/* players first: resetVideoData() checks who is playing (ai->active),
+	   which before the first game is still uninitialized memory. A player
+	   it took for absent drove invisibly, and fast_finish ran the round
+	   at 12 times speed. */
 	resetPlayerData();
+  resetVideoData();
 
   initWalls();
 }

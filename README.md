@@ -120,13 +120,17 @@ the tree still builds natively.
 - **Game type "both"** (booster and wall acceleration) is the default;
   settings saved before this get it once.
 
-One change applies to native builds too:
+Two changes apply to native builds too:
 
 - **Boost meter:** a bar left of the minimap shows the booster tank in the
   player's trail color, with a notch at `booster_min` (the least it takes to
   start a boost). "wall" over the minimap lights up while wall acceleration
   is speeding the player up (`drawBoostMeter()` in
   `src/video/graphics_hud.c`).
+- **First-game fix:** `initData()` set up each player's visuals before the
+  player, so it read whether they were playing from uninitialized memory.
+  On an unlucky first game after launch, player 1's bike was invisible and
+  `fast_finish`, taking them for dead, ran the round at 12 times speed.
 
 ## Embedding
 
