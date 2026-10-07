@@ -57,6 +57,10 @@ the tree still builds natively.
   the linker bound gl4es's calls to GLtron's.
 - `SourceSample` loads with `Sound_NewSampleFromFile` (Emscripten's SDL_RWops
   can't be read from C).
+- Players 3 and 4 get web key codes for their default arrow/keypad keys:
+  Emscripten's SDL numbers those keys differently from SDL 1.2.
+- Touch controls queue key presses that are handled at the start of the next
+  frame, exactly like real keys (`web_touch()` in `web/port/web.c`).
 
 ## Embedding
 
@@ -70,6 +74,7 @@ the tree still builds natively.
     onQuit: function () { /* close the window */ },
     maxPixelRatio: 2,                  // cap render resolution on hi-DPI screens
     music: { base: 'https://cdn.example/music/', tracks: ['song.mp3'] },
+    touch: 'auto',                     // on-screen controls: true, false or 'auto'
   };
 </script>
 <script src="shell.js"></script>
@@ -89,6 +94,19 @@ Player 1 turns with `A` / `S`, boosts with `D`, looks around with `Q` / `W`.
 `Space` pauses, `Esc` opens the menu, `F10` changes the camera and
 `F1`–`F4` switch between single and split-screen layouts.
 Players 2–4 are configurable in Game → Configure Keys.
+
+On touch screens, on-screen controls appear by themselves and hide again when
+a keyboard is used (add `?touch=1` or `?touch=0` to the URL to force them):
+
+- **Racing:** tap the left or right half of the screen to turn, hold Boost
+  to boost. The corner buttons pause and open the menu.
+- **Paused or round over:** tap anywhere to continue.
+- **Menus:** the arrow pad moves and changes values, OK selects, Back goes up
+  a menu (or back to the race from the top menu).
+
+Turning uses the first human player's own key bindings, so it keeps working
+after keys are rebound. Upright phones get the game at the top with the
+controls below it; sideways phones put the steering hints in the side bars.
 
 ## Licenses
 

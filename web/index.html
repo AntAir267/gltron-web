@@ -4,25 +4,104 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>GLtron</title>
 <style>
-  :root { --bg: #000; --fg: #9cf; --track: #123; }
+  :root { --bg: #000; --fg: #9cf; --track: #123; --vh: 100vh;
+    --btn: rgba(140, 200, 255, .16); --btn-down: rgba(140, 200, 255, .42);
+    --btn-edge: rgba(160, 215, 255, .55); }
+  @supports (height: 100dvh) { :root { --vh: 100dvh; } }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
     font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; }
   /* the game lays itself out for 4:3, so letterbox to that */
   #canvas { position: absolute; inset: 0; margin: auto; display: block; outline: none;
-    width: min(100vw, calc(100vh * 4 / 3)); height: min(100vh, calc(100vw * 3 / 4));
+    width: min(100vw, calc(var(--vh) * 4 / 3)); height: min(var(--vh), calc(100vw * 3 / 4));
     background: #000; touch-action: none; }
   #loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
     width: min(320px, 80vw); text-align: center; pointer-events: none; }
   #track { height: 4px; background: var(--track); margin-top: 8px; }
   #bar { height: 100%; width: 0; background: var(--fg); transition: width .1s; }
+
+  /* ---- touch controls (web/shell.js shows them for touch screens) ---- */
+  /* upright phones: game at the top, controls in the space below it */
+  @media (orientation: portrait) { body.touch #canvas { margin-top: env(safe-area-inset-top); } }
+  #touch { position: fixed; inset: 0; z-index: 5; touch-action: none; user-select: none;
+    -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  /* shell.js hides every control whose data-on doesn't list the current screen */
+  #touch[hidden], #touch [hidden] { display: none !important; }
+  #touch button { pointer-events: auto; touch-action: none; display: flex; align-items: center;
+    justify-content: center; padding: 0; margin: 0; border: 2px solid var(--btn-edge);
+    background: var(--btn); color: var(--fg); font: bold 15px/1 inherit; letter-spacing: .05em;
+    border-radius: 50%; width: 64px; height: 64px; -webkit-appearance: none; appearance: none; }
+  #touch .held { background: var(--btn-down); }
+  #touch svg { width: 45%; height: 45%; fill: currentColor; }
+  /* steering: each half of the screen turns that way */
+  .steer { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; align-items: flex-end;
+    justify-content: center; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .steer.left { left: 0; } .steer.right { right: 0; }
+  #touch .steer svg { width: 44px; height: 44px; opacity: .3; }
+  #touch .steer.held { background: rgba(140, 200, 255, .07); }
+  .steer.held svg { opacity: .7; }
+  .boost { position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: calc(20px + env(safe-area-inset-bottom)); }
+  #touch .boost { width: 76px; height: 76px; font-size: 13px; }
+  .corner { position: absolute; display: flex; gap: 12px; top: calc(12px + env(safe-area-inset-top));
+    right: calc(12px + env(safe-area-inset-right)); }
+  #touch .corner button { width: 48px; height: 48px; }
+  .tap { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom)); font-size: 15px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--fg); opacity: .8; }
+  .dpad { position: absolute; display: grid; grid-template: repeat(3, 60px) / repeat(3, 60px);
+    left: calc(16px + env(safe-area-inset-left)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+  #touch .dpad button { width: 58px; height: 58px; border-radius: 14px; }
+  .dpad .up { grid-area: 1 / 2; } .dpad .left { grid-area: 2 / 1; }
+  .dpad .right { grid-area: 2 / 3; } .dpad .down { grid-area: 3 / 2; }
+  .ab { position: absolute; display: flex; gap: 14px; align-items: flex-end;
+    right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+  #touch .ab .ok { width: 76px; height: 76px; margin-bottom: 30px; }
+  /* sideways phones: the 4:3 game leaves bars left and right, so the hints
+     go there, and the pause hint goes up top, clear of GLtron's own messages */
+  @media (orientation: landscape) {
+    .steer { align-items: center; padding-bottom: 0; }
+    .steer.left { justify-content: flex-start; padding-left: calc(28px + env(safe-area-inset-left)); }
+    .steer.right { justify-content: flex-end; padding-right: calc(28px + env(safe-area-inset-right)); }
+    .tap { align-items: flex-start; padding: calc(18px + env(safe-area-inset-top)) 0 0; }
+    .dpad { grid-template: repeat(3, 52px) / repeat(3, 52px); }
+    #touch .dpad button { width: 50px; height: 50px; }
+  }
 </style>
 </head>
 <body>
 <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
 <div id="loading"><div id="status">Loading GLtron...</div><div id="track"><div id="bar"></div></div></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M16 4 6 12l10 8z"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m8 4 10 8-10 8z"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m4 16 8-10 8 10z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m4 8 8 10 8-10z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16v2.5H4zm0 4.75h16v2.5H4zM4 15.5h16V18H4z"/></symbol>
+</svg>
+<div id="touch" hidden oncontextmenu="event.preventDefault()">
+  <div class="steer left" data-on="game" data-touch="7"><svg><use href="#i-left"/></svg></div>
+  <div class="steer right" data-on="game" data-touch="8"><svg><use href="#i-right"/></svg></div>
+  <div class="tap" data-on="pause credits" data-touch="6">Tap to continue</div>
+  <div class="corner" data-on="game pause">
+    <button class="pause" data-on="game" data-touch="6" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+    <button data-touch="5" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+  </div>
+  <button class="boost" data-on="game" data-touch="9">BOOST</button>
+  <div class="dpad" data-on="gui">
+    <button class="up" data-touch="0" data-repeat aria-label="Up"><svg><use href="#i-up"/></svg></button>
+    <button class="left" data-touch="2" data-repeat aria-label="Left"><svg><use href="#i-left"/></svg></button>
+    <button class="right" data-touch="3" data-repeat aria-label="Right"><svg><use href="#i-right"/></svg></button>
+    <button class="down" data-touch="1" data-repeat aria-label="Down"><svg><use href="#i-down"/></svg></button>
+  </div>
+  <div class="ab" data-on="gui configure">
+    <button class="back" data-on="gui configure" data-touch="5">BACK</button>
+    <button class="ok" data-on="gui" data-touch="4">OK</button>
+  </div>
+</div>
 <script src="music/tracks.js"></script>
 <script src="shell.js"></script>
 </body>

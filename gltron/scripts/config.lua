@@ -125,6 +125,20 @@ settings.keys = {
    }
 }
 
+if(WEB) then
+	-- Emscripten's SDL numbers arrow, End and keypad keys differently from
+	-- SDL 1.2 (scancode + 1024), so the defaults above wouldn't match
+	settings.keys[3].left = 1104 -- cursor left
+	settings.keys[3].right = 1103 -- cursor right
+	settings.keys[3].glance_right = 1101 -- 'end'
+	settings.keys[3].boost = 1105 -- cursor down
+	settings.keys[4].left = 1116 -- keypad 4
+	settings.keys[4].right = 1118 -- keypad 6
+	settings.keys[4].glance_left = 1119 -- keypad 7
+	settings.keys[4].glance_right = 1121 -- keypad 9
+	settings.keys[4].boost = 1117 -- keypad 5
+end
+
 -- these tables are not serialized to RCNAME (yet)
 -- some values are set in artpack.lua
 video = {} 

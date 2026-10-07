@@ -50,11 +50,38 @@ static void SystemPollEvents(void) {
 }
 
 #ifdef __EMSCRIPTEN__
+EM_JS(void, web_screen_changed, (const char *name), {
+  if (Module.onScreen) Module.onScreen(UTF8ToString(name));
+});
+
+/* Keys from the page's touch controls (see web/port/web.c). They're
+   handled at the start of the next frame, like real key presses. */
+#define KEY_QUEUE_SIZE 32
+static int queued_keys[KEY_QUEUE_SIZE][2];
+static int queued_count = 0;
+
+void SystemQueueKey(int key, int state) {
+  if(queued_count < KEY_QUEUE_SIZE) {
+    queued_keys[queued_count][0] = key;
+    queued_keys[queued_count][1] = state;
+    queued_count++;
+  }
+}
+
+static void SystemDispatchQueuedKeys(void) {
+  int i, n = queued_count;
+  queued_count = 0;
+  for(i = 0; i < n; i++)
+    if(current && current->keyboard)
+      current->keyboard(queued_keys[i][1], queued_keys[i][0], 0, 0);
+}
+
 /* The browser owns the loop: it calls SystemFrame once per animation frame.
    When a callback set asks to leave the loop (SystemExitLoop), main.lua's
    MainLoopReturned() picks the next one, as its while loop does natively. */
 static void SystemFrame(void) {
   SystemPollEvents();
+  SystemDispatchQueuedKeys();
   if(!current)
     return;
   current->idle();
@@ -98,6 +125,9 @@ int SystemMainLoop() {
   
 void SystemRegisterCallbacks(Callbacks *cb) {
   current = cb;
+#ifdef __EMSCRIPTEN__
+  web_screen_changed(cb->name);
+#endif
 }
 
 void SystemExitLoop(int value) {
