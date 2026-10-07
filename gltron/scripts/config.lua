@@ -155,12 +155,21 @@ if(WEB) then
 	settings.keys[4].boost = 1117 -- keypad 5
 	web_default_keys = settings.keys
 
+	-- game type "both": the booster and wall acceleration
+	settings.booster_on = 1
+	settings.wall_accel_on = 1
+
 	-- after the settings file loads (init.c): saves from before this
 	-- version get the new key defaults once
 	function web_update_settings()
 		if(settings.web_keys ~= 2) then
 			settings.keys = web_default_keys
 			settings.web_keys = 2
+		end
+		if(settings.web_rules ~= 1) then
+			settings.booster_on = 1
+			settings.wall_accel_on = 1
+			settings.web_rules = 1
 		end
 	end
 end

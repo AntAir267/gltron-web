@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "game/game.h"
 #include "video/video.h"
 #include "audio/audio.h"
@@ -86,6 +87,7 @@ void resetPlayerData(void) {
 		/* data->dir = startdir[i]; */
 		data->last_dir = data->dir;
 
+		data->wall_accel_active = 0;
 		/* if player is playing... */
 		if(ai->active != AI_NONE) {
 			data->speed = getSettingf("speed");

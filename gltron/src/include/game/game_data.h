@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 /* Modified by Debian's gltron package patches (see patches/debian/). */
 #ifndef GAME_DATA_H
 #define GAME_DATA_H
@@ -60,6 +61,7 @@ typedef struct Data {
   float speed; /* set to -1 when dead */
 	float booster;
 	int boost_enabled;
+	int wall_accel_active; /* an enemy trail is speeding this player up */
 	float trail_height;
 
 	int last_dir;

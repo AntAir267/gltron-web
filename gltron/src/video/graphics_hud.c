@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "video/video.h"
 #include "game/game.h"
 
@@ -71,6 +72,86 @@ void drawScore(Player *p, Visual *d) {
 }
 
   
+/* The boost meter: a vertical bar left of the minimap showing the player's
+   booster tank in their trail color, with a notch at booster_min (the least
+   it takes to start boosting; below it the bar is dim) and brighter while
+   boosting. With wall acceleration on, "wall" over the minimap lights up
+   while an enemy trail speeds the player up. */
+void drawBoostMeter(Player *p, PlayerVisual *pV, Visual *d) {
+  int booster = getSettingf("booster_on") == 1;
+  int wall = getSettingf("wall_accel_on") == 1;
+  float *c = pV->pColorAlpha;
+  float mx, s, x, y, w, h, gap, label, max, level, notch, a, glow;
+  int usable;
+
+  if((!booster && !wall) || p->data->speed <= 0)
+    return;
+
+  /* the minimap is the square that fits a map_ratio-sized box, 20 pixels
+     in from the corner (drawGame, draw2D) */
+  if(gSettingsCache.map_ratio_w > 0) {
+    float bw = d->vp_w * gSettingsCache.map_ratio_w;
+    float bh = d->vp_h * gSettingsCache.map_ratio_h;
+    s = bw < bh ? bw : bh;
+    mx = 20 + (bw - s) / 2;
+  } else {
+    s = d->vp_h / 3.0f;
+    mx = 20 + s * 0.2f;
+  }
+  w = s * 0.07f;
+  gap = s * 0.03f;
+  x = mx - gap - w;
+  if(x < 4)
+    x = 4;
+  /* the bar's top lines up with the minimap's; its bottom stays clear of
+     the score (drawScore: 32 pixels high, 5 in from the corner) */
+  y = 20;
+  if(gSettingsCache.show_scores && y < 5 + 32 + gap)
+    y = 5 + 32 + gap;
+  h = 20 + s - y;
+  label = s * 0.055f;
+
+  rasonly(d);
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  if(booster) {
+    max = getSettingf("booster_max");
+    level = p->data->booster / max;
+    notch = getSettingf("booster_min") / max;
+    usable = p->data->boost_enabled || p->data->booster > getSettingf("booster_min");
+    a = usable ? 0.9f : 0.35f;
+    glow = p->data->boost_enabled ? 0.45f : 0;
+
+    glColor4f(0, 0, 0, 0.45f);
+    glBegin(GL_QUADS);
+    glVertex2f(x, y); glVertex2f(x + w, y); glVertex2f(x + w, y + h); glVertex2f(x, y + h);
+    glColor4f(c[0] + (1 - c[0]) * glow, c[1] + (1 - c[1]) * glow,
+              c[2] + (1 - c[2]) * glow, a);
+    glVertex2f(x, y); glVertex2f(x + w, y);
+    glVertex2f(x + w, y + h * level); glVertex2f(x, y + h * level);
+    glEnd();
+
+    glColor4f(1, 1, 1, 0.6f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(x, y); glVertex2f(x + w, y); glVertex2f(x + w, y + h); glVertex2f(x, y + h);
+    glEnd();
+    glBegin(GL_LINES);
+    glVertex2f(x, y + h * notch); glVertex2f(x + w, y + h * notch);
+    glEnd();
+
+    glColor4f(1, 1, 1, usable ? 0.9f : 0.5f);
+    drawText(gameFtx, x, 20 + s + gap, label, "boost");
+  }
+  if(wall) {
+    /* on the label row, right-aligned to the minimap */
+    glColor4f(1, 1, 1, p->data->wall_accel_active ? 1.0f : 0.3f);
+    drawText(gameFtx, mx + s - 4 * label, 20 + s + gap, label, "wall");
+  }
+  glDisable(GL_BLEND);
+}
+
 void drawFPS(Visual *d) {
 #define FPS_HSIZE 20
   /* draws FPS in upper left corner of Display d */

@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 /* Modified by Debian's gltron package patches (see patches/debian/). */
 #include <math.h>
 #include <float.h>
@@ -244,12 +245,14 @@ List* doMovement(int mode, int dt) {
 
 			// speed boost:
 			float deccel = 0;
+			data->wall_accel_active = 0;
 			if(getSettingf("wall_accel_on") == 1) {
 				if(!applyWallAcceleration(i, dt)) {
 					deccel = getSettingf("wall_accel_decrease");
 				}
 				else {
 					deccel = -1; // forbid deacceleration for booster
+					data->wall_accel_active = 1;
 				}
 			}
 			if(getSettingf("booster_on") == 1) {

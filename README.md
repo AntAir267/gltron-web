@@ -117,6 +117,16 @@ the tree still builds natively.
   blanks and "unknown custom key". `web/port/sdl_compat.c` names every key.
 - Touch controls queue key presses that are handled at the start of the next
   frame, exactly like real keys (`web_touch()` in `web/port/web.c`).
+- **Game type "both"** (booster and wall acceleration) is the default;
+  settings saved before this get it once.
+
+One change applies to native builds too:
+
+- **Boost meter:** a bar left of the minimap shows the booster tank in the
+  player's trail color, with a notch at `booster_min` (the least it takes to
+  start a boost). "wall" over the minimap lights up while wall acceleration
+  is speeding the player up (`drawBoostMeter()` in
+  `src/video/graphics_hud.c`).
 
 ## Embedding
 
@@ -159,6 +169,11 @@ player has them: `A` / `S` turn and `E` boosts (they belong to player 3 in the
 web build). `C` (or `F10`) cycles the camera views, `Space` pauses, `Esc` opens
 the menu, and `F1`–`F4` switch between single and split-screen layouts.
 Players 2–4 are configurable in Game → Configure Keys.
+
+The bar left of the minimap is your boost tank. It drains while you boost,
+refills while you don't, and has to be above the notch to start a boost.
+"wall" over the minimap lights up while riding close to another bike's
+trail speeds you up.
 
 On touch screens, on-screen controls appear by themselves and hide again when
 a keyboard is used (add `?touch=1` or `?touch=0` to the URL to force them):

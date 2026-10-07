@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #ifndef GRAPHICS_HUD_H
 #define GRAPHICS_HUD_H
 
@@ -8,6 +9,7 @@ extern void drawAI(Visual *d);
 extern void drawPause(Visual *d);
 
 extern void drawScore(Player *p, Visual *d);
+extern void drawBoostMeter(Player *p, PlayerVisual *pV, Visual *d);
 extern void drawFPS(Visual *d);
 
 extern void drawConsoleLines(char *line, int call);
