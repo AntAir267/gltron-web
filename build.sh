@@ -5,6 +5,12 @@
 #
 #   ./build.sh          release build
 #   ./build.sh debug    -O0, assertions, source maps
+#   ./build.sh ship     release build with your site's settings, then your
+#                       site's ship command, both from ship.local (not in git):
+#                         SITE_JS=../mysite/gltron/site.js
+#                         EXTRA_ART=../mysite/gltron/myskin
+#                         SHIP="python3 ../mysite/tools/ship-game.py gltron"
+#                       (paths relative to this folder)
 #
 # EXTRA_ART="dir ..." adds artpacks (folders shaped like gltron/art/default)
 # that live outside this repo, e.g. a site's own skin.
@@ -18,6 +24,21 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 MODE="${1:-release}"
+SHIP=""
+if [ "$MODE" = ship ]; then
+  [ -f "$ROOT/ship.local" ] || { echo "ship: no ship.local (see the top of build.sh)" >&2; exit 1; }
+  # a site's build ships a commit, so check for uncommitted changes before building
+  if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
+    echo "ship: commit your changes first" >&2; exit 1
+  fi
+  # shellcheck disable=SC1091
+  source "$ROOT/ship.local"
+  [ -n "$SHIP" ] || { echo "ship: ship.local doesn't set SHIP" >&2; exit 1; }
+  abs() { local p out=""; for p in $1; do out+="$(cd "$ROOT" && realpath "$p") "; done; echo "${out% }"; }
+  [ -z "${SITE_JS:-}" ] || SITE_JS="$(abs "$SITE_JS")"
+  [ -z "${EXTRA_ART:-}" ] || EXTRA_ART="$(abs "$EXTRA_ART")"
+  MODE=release
+fi
 BUILD="$ROOT/build/$MODE"
 DIST="$ROOT/dist"
 
@@ -180,3 +201,7 @@ em++ "${OPT[@]}" "${LINK_OPT[@]}" "${PORTS[@]}" "${objs[@]}" "$GL4ES/lib/libGL.a
 
 cp "$ROOT/web/index.html" "$ROOT/web/shell.js" "$DIST/"
 echo "built $DIST ($(du -sh "$DIST" | cut -f1))"
+
+if [ -n "$SHIP" ]; then
+  (cd "$ROOT" && bash -c "$SHIP")
+fi

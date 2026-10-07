@@ -57,6 +57,18 @@ window.GLTRON_MUSIC = { base: 'https://cdn.example/music/', tracks: ['song.mp3']
 
 Without `SITE_JS`, `site.js` lists the stock soundtrack, "Revenge of the Cats".
 
+To build for your site and publish in one step, put your settings and your
+site's publish command in `ship.local` (ignored by git), then run
+`./build.sh ship`. It refuses to run with uncommitted changes, so what you
+publish always matches a commit.
+
+```bash
+# ship.local (paths relative to this folder)
+SITE_JS=../mysite/gltron/site.js
+EXTRA_ART=../mysite/gltron/myskin
+SHIP="python3 ../mysite/tools/ship-game.py gltron"
+```
+
 ## Layout
 
 | Path | What |
