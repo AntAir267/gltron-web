@@ -29,6 +29,16 @@ python3 -m http.server 8765 --directory dist
 
 The first build clones and compiles gl4es into `build/gl4es`.
 
+To add skins (GLtron "artpacks": a folder of textures plus `artpack.lua`, shaped
+like `gltron/art/default`) that live outside this repo:
+
+```bash
+EXTRA_ART="/path/to/myskin" ./build.sh
+```
+
+Players switch skins in Video → Artpack; a page can pick the starting one
+(see `artpack` below).
+
 ## Layout
 
 | Path | What |
@@ -75,6 +85,7 @@ the tree still builds natively.
     maxPixelRatio: 2,                  // cap render resolution on hi-DPI screens
     music: { base: 'https://cdn.example/music/', tracks: ['song.mp3'] },
     touch: 'auto',                     // on-screen controls: true, false or 'auto'
+    artpack: 'myskin',                 // starting skin (?artpack= works too)
   };
 </script>
 <script src="shell.js"></script>

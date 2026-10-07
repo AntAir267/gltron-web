@@ -81,6 +81,11 @@ settings.joy_threshold = 0.10
 if(WEB) then
 	-- WebGL always has a stencil buffer, so shadows can be translucent
 	settings.use_stencil = 1
+	-- the page can pick the starting artpack (GLTRON.artpack in shell.js);
+	-- a player's own choice, once saved, still wins
+	if(getenv("GLTRON_ARTPACK")) then
+		settings.current_artpack = getenv("GLTRON_ARTPACK")
+	end
 end
 
 -- audio
