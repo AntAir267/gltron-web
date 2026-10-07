@@ -9,7 +9,8 @@
 //     muted: false,         // start with all sound off
 //     maxPixelRatio: 2,     // cap on render resolution per CSS pixel
 //     music: { base: 'music/', tracks: ['song.mp3'] },  // else music/tracks.js
-//   }
+//     touch: 'auto',        // on-screen controls: true, false or 'auto'
+//   }                       // (?touch=1 / ?touch=0 in the URL also works)
 // and afterwards call window.GLTRON.setMuted(bool).
 (function () {
   'use strict';
@@ -108,6 +109,78 @@
     };
   })();
 
+  // On-screen controls for touch screens. Each control's data-touch number
+  // is a TOUCH_* value in web/port/web.c; web_touch() turns it into the key
+  // GLtron expects, so these behave exactly like key presses.
+  var touch = (function () {
+    var el = document.getElementById('touch');
+    var param = new URLSearchParams(location.search).get('touch');
+    var mode = param === '1' ? true : param === '0' ? false :
+      (opts.touch === undefined ? 'auto' : opts.touch);
+    var held = {};  // pointerId -> { node, control, timer }
+
+    function show(on) {
+      el.hidden = !on;
+      document.body.classList.toggle('touch', on);
+    }
+    show(mode === true ||
+      (mode === 'auto' && window.matchMedia && matchMedia('(pointer: coarse)').matches));
+    if (mode === 'auto') {
+      // follow what the player actually uses, e.g. on a 2-in-1 laptop
+      window.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch') show(true);
+      }, true);
+      window.addEventListener('keydown', function (e) {
+        if (e.isTrusted) show(false);
+      }, true);
+    }
+
+    function send(control, down) {
+      if (ready) Module._web_touch(control, down ? 1 : 0);
+    }
+    function release(id) {
+      var h = held[id];
+      if (!h) return;
+      delete held[id];
+      clearTimeout(h.timer);
+      h.node.classList.remove('held');
+      send(h.control, false);
+    }
+    // menu arrows repeat while held, like a held key
+    function repeat(id, delay) {
+      var h = held[id];
+      if (!h) return;
+      h.timer = setTimeout(function () {
+        send(h.control, true);
+        repeat(id, 110);
+      }, delay);
+    }
+
+    el.addEventListener('pointerdown', function (e) {
+      var node = e.target.closest('[data-touch]');
+      if (!node) return;
+      release(e.pointerId);
+      // keep the release coming to us if the finger slides off the control
+      try { node.setPointerCapture(e.pointerId); } catch (err) { /* not a live pointer */ }
+      node.classList.add('held');
+      held[e.pointerId] = { node: node, control: +node.dataset.touch, timer: 0 };
+      send(held[e.pointerId].control, true);
+      if (node.hasAttribute('data-repeat')) repeat(e.pointerId, 400);
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (type) {
+      el.addEventListener(type, function (e) { release(e.pointerId); });
+    });
+
+    return {
+      screen: function (name) {
+        for (var id in held) release(id);
+        el.querySelectorAll('[data-on]').forEach(function (node) {
+          node.hidden = node.dataset.on.split(' ').indexOf(name) < 0;
+        });
+      },
+    };
+  })();
+
   opts.setMuted = function (value) {
     muted = !!value;
     if (ready) Module._web_set_muted(muted ? 1 : 0);
@@ -121,6 +194,7 @@
     printErr: function (t) { console.warn(t); },
     setStatus: setStatus,
     onSettingsSaved: flush,
+    onScreen: touch.screen,
     onQuit: function () {
       save();
       if (opts.onQuit) opts.onQuit();
