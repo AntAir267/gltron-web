@@ -270,6 +270,11 @@
   });
   window.addEventListener('pagehide', save);
   canvas.addEventListener('mousedown', function () { canvas.focus(); });
+  // no context menu over the game (handled here rather than with inline
+  // attributes, so strict Content-Security-Policy hosts work)
+  [canvas, document.getElementById('touch')].forEach(function (el) {
+    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  });
 
   var script = document.createElement('script');
   script.src = 'gltron.js';
