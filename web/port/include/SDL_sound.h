@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later
+   Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron. */
 /* The slice of the SDL_sound 1.0 API that GLtron uses, for the web build.
    Only whole-file loading of PCM WAV is supported (see sdl_sound.c); music
    is played by the page instead (see SourceMusic.cpp). */

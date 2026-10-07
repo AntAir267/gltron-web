@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later
+   Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron. */
 /* SDL 1.2 functions GLtron's mixer uses that Emscripten's SDL 1 lacks.
    The page is single-threaded, so the semaphores never block. */
 #include "SDL.h"

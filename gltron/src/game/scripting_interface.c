@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "game/gltron.h"
 #include "base/switchCallbacks.h"
 #include "scripting/nebu_scripting.h"

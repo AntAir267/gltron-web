@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 #ifndef GAME_DATA_H
 #define GAME_DATA_H
 

@@ -1,3 +1,4 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
 #include "video/video.h"
 #include "game/game.h"
 

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later
+   Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron. */
 /* Minimal SDL_sound for the web build: loads a whole PCM WAV file that is
    already in the mixer's format. build.sh converts the game's WAVs to
    22050 Hz signed 16-bit stereo, which is what GLtron opens the device with. */

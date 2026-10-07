@@ -1,3 +1,4 @@
+-- Modified 2026-10 by Anthony Airdo for the web build (gltron-web).
 -- loop until RETURN_QUIT code is sent
 
 RETURN_GAME_LAUNCH = 0

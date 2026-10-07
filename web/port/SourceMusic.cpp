@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later
+   Copyright 2026 Anthony Airdo. Part of gltron-web, a web port of GLtron. */
 /* Web replacement for nebu/audio/SourceMusic.cpp.
    Instead of decoding music into the mixer, hand it to the page
    (Module.music in shell.js), which streams it with an <audio> element.

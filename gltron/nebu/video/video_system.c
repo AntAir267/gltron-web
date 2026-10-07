@@ -1,3 +1,5 @@
+/* Modified by Debian's gltron package patches (see patches/debian/). */
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "Nebu_video.h"
 
 #include "SDL.h"
