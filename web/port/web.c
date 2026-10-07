@@ -78,6 +78,11 @@ EMSCRIPTEN_KEEPALIVE void web_touch(int control, int down) {
     SystemQueueKey(key, down ? SYSTEM_KEYSTATE_DOWN : SYSTEM_KEYSTATE_UP);
 }
 
+/* A song finished and there are more: on to the next, as the Song menu would */
+EMSCRIPTEN_KEEPALIVE void web_next_track(void) {
+  scripting_Run("nextTrack()");
+}
+
 /* Write settings to /prefs; the page then flushes /prefs to IndexedDB. */
 EMSCRIPTEN_KEEPALIVE void web_save(void) {
   saveSettings();
