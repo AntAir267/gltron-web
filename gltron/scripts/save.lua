@@ -1,3 +1,4 @@
+-- Modified 2026-10 by Anthony Airdo for the web build (gltron-web).
 -- dump global environment
 
 function savevar (n,v)
@@ -28,6 +29,17 @@ function savevar (n,v)
  write("\n")
 end
 
+-- savevar marks every table it writes (__visited__) to catch loops. Clear
+-- the marks afterwards: otherwise the next save in the same run writes
+-- "settings.keys = keys" and the key table is gone on the next start.
+function unmark (n,v)
+ if type(v) == "table" and v.__visited__ ~= nil then
+   v.__visited__ = nil
+   foreach(v,unmark)
+ end
+end
+
 function save ()
   foreach(settings,savevar)
+  foreach(settings,unmark)
 end

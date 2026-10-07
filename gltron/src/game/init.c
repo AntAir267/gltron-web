@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "filesystem/path.h"
 #include "game/init.h"
 #include "game/gltron.h"
@@ -55,6 +56,9 @@ void initConfiguration(int argc, const char *argv[])
 		printf("[warning] old config file found, overriding using defaults\n");
 	}
 	// check if config is valid
+	/* a file saved twice in one run before save.lua cleared its marks lost
+	   its key table ("settings.keys = keys"); treat it as defunct too */
+	scripting_Run("if type(settings.keys) ~= \"table\" then save_completed = nil end");
 	scripting_GetGlobal("save_completed", NULL);
 	if(scripting_IsNilResult()) {
 		runScript(PATH_SCRIPTS, "config.lua");
