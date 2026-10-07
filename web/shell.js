@@ -3,12 +3,13 @@
 // Host-page glue for gltron.js: canvas sizing, loading status, saved
 // settings, streamed music and the mute switch.
 //
-// Embedders can set these before loading this script:
+// Embedders can set these before loading this script (site.js, written by
+// build.sh, is the place for a site's own settings):
 //   window.GLTRON = {
 //     onQuit() {},          // the player chose Quit and left the credits
 //     muted: false,         // start with all sound off
 //     maxPixelRatio: 2,     // cap on render resolution per CSS pixel
-//     music: { base: 'music/', tracks: ['song.mp3'] },  // else music/tracks.js
+//     music: { base: 'music/', tracks: ['song.mp3'] },  // else GLTRON_MUSIC
 //                           // tracks can also be { file: 'dir/song.mp3', title: 'Song' };
 //                           // start: 'dir/song.mp3' opens every visit on that track
 //     touch: 'auto',        // on-screen controls: true, false or 'auto'

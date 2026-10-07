@@ -8,8 +8,9 @@
 #
 # EXTRA_ART="dir ..." adds artpacks (folders shaped like gltron/art/default)
 # that live outside this repo, e.g. a site's own skin.
-# MUSIC_JS=file.js replaces the stock soundtrack with that playlist (it sets
-# window.GLTRON_MUSIC, see web/shell.js).
+# SITE_JS=file.js configures the game for a site: it runs before shell.js and
+# can set window.GLTRON options (artpack, music, ...) and/or GLTRON_MUSIC. A
+# build with it leaves out the stock soundtrack.
 #
 # Needs the Emscripten SDK (EMSDK env var, or ~/emsdk) and ffmpeg (with
 # libopenmpt, for the .it soundtrack).
@@ -149,12 +150,13 @@ for f in "$G"/data/*.wav; do
     "$DATA/data/$(basename "$f")"
 done
 
-# music is streamed by the page, not packaged
-mkdir -p "$DIST/music"
-if [ -n "${MUSIC_JS:-}" ]; then
-  rm -f "$DIST"/music/*.mp3
-  cp "$MUSIC_JS" "$DIST/music/tracks.js"
+# site.js: the site's own settings, or the stock soundtrack. Music is
+# streamed by the page, not packaged.
+rm -rf "$DIST/music"
+if [ -n "${SITE_JS:-}" ]; then
+  cp "$SITE_JS" "$DIST/site.js"
 else
+mkdir -p "$DIST/music"
 tracks=()
 for f in "$G"/music/*.it; do
   mp3="$DIST/music/$(basename "${f%.*}").mp3"
@@ -163,8 +165,8 @@ for f in "$G"/music/*.it; do
   fi
   tracks+=("\"$(basename "$mp3")\"")
 done
-printf 'window.GLTRON_MUSIC = { base: "music/", tracks: [%s] };\n' \
-  "$(IFS=,; echo "${tracks[*]}")" > "$DIST/music/tracks.js"
+printf '// the stock soundtrack (build.sh)\nwindow.GLTRON_MUSIC = { base: "music/", tracks: [%s] };\n' \
+  "$(IFS=,; echo "${tracks[*]}")" > "$DIST/site.js"
 fi
 
 # ---- link --------------------------------------------------------------------
