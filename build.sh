@@ -6,6 +6,9 @@
 #   ./build.sh          release build
 #   ./build.sh debug    -O0, assertions, source maps
 #
+# EXTRA_ART="dir ..." adds artpacks (folders shaped like gltron/art/default)
+# that live outside this repo, e.g. a site's own skin.
+#
 # Needs the Emscripten SDK (EMSDK env var, or ~/emsdk) and ffmpeg (with
 # libopenmpt, for the .it soundtrack).
 set -euo pipefail
@@ -124,6 +127,9 @@ for p in "${pids[@]}"; do wait "$p" || fail=1; done
 DATA="$BUILD/data/gltron"
 rm -rf "$BUILD/data" && mkdir -p "$DATA"
 cp -r "$G/scripts" "$G/data" "$G/art" "$DATA/"
+for pack in ${EXTRA_ART:-}; do
+  cp -r "$pack" "$DATA/art/$(basename "$pack")"
+done
 find "$DATA" -name 'Makefile*' -delete
 # effects: the mixer runs at 22050 Hz, 16-bit stereo; the .ogg copies are unused
 rm "$DATA"/data/*.ogg

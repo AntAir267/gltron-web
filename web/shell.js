@@ -10,7 +10,9 @@
 //     maxPixelRatio: 2,     // cap on render resolution per CSS pixel
 //     music: { base: 'music/', tracks: ['song.mp3'] },  // else music/tracks.js
 //     touch: 'auto',        // on-screen controls: true, false or 'auto'
-//   }                       // (?touch=1 / ?touch=0 in the URL also works)
+//                           // (?touch=1 / ?touch=0 in the URL also works)
+//     artpack: 'default',   // starting skin, if build.sh packaged it
+//   }                       // (?artpack=name in the URL also works)
 // and afterwards call window.GLTRON.setMuted(bool).
 (function () {
   'use strict';
@@ -200,6 +202,8 @@
       if (opts.onQuit) opts.onQuit();
     },
     preRun: [function () {
+      var artpack = new URLSearchParams(location.search).get('artpack') || opts.artpack;
+      if (artpack) ENV.GLTRON_ARTPACK = artpack;
       FS.mkdir('/prefs');
       FS.mount(IDBFS, {}, '/prefs');
       Module.addRunDependency('prefs');
