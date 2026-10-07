@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "game/gltron.h"
 
 /* very brief - just the pause mode */
@@ -34,6 +35,9 @@ void keyboardPause(int state, int key, int x, int y) {
   case SYSTEM_KEY_F5: saveSettings(); break;
 
   case SYSTEM_KEY_F10: nextCameraType(); break;
+#ifdef __EMSCRIPTEN__
+  case 'c': nextCameraType(); break; /* as in the race (keyGame) */
+#endif
 
   case SYSTEM_KEY_F11: doBmpScreenShot(gScreen); break;
   case SYSTEM_KEY_F12: doPngScreenShot(gScreen); break;
