@@ -101,6 +101,11 @@ EM_JS(char*, web_music_tracks, (void), {
   return stringToNewUTF8(names.join("\n"));
 });
 
+/* the track the page wants every visit to start on, or "" */
+EM_JS(char*, web_music_start, (void), {
+  return stringToNewUTF8((Module.music && Module.music.start && Module.music.start()) || "");
+});
+
 void Sound_initTracks(void) {
   char *names = web_music_tracks();
   char *name;
@@ -115,6 +120,10 @@ void Sound_initTracks(void) {
     /* no music: keep the Song menu working */
     scripting_Run("tracks[1] = \"none\"");
   }
+  name = web_music_start();
+  if(*name)
+    scripting_RunFormat("settings.current_track = \"%s\"", name);
+  free(name);
   scripting_Run("setupSoundTrack()");
 }
 #else

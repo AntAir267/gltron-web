@@ -21,10 +21,11 @@ the `.it` soundtrack to MP3).
 ./build.sh debug    # -O0, assertions, source map
 ```
 
-Serve `dist/` from any static web server, for example:
+Serve `dist/` from any static web server. For testing, `tools/serve.py` serves it
+with browser caching off, so a reload always gets the latest build:
 
 ```bash
-python3 -m http.server 8765 --directory dist
+python3 tools/serve.py 8765
 ```
 
 The first build clones and compiles gl4es into `build/gl4es`.
@@ -83,6 +84,9 @@ the tree still builds natively.
 - **Extra keys:** unbound arrow keys steer the first human player (Left/Right
   turn, Up boosts) and `C` cycles the camera. Because the arrows steer, the
   in-race console scrolls with PageUp/PageDown.
+- **Key names:** Emscripten's SDL only names a-z and 0-9, and numbers arrows,
+  F-keys and the keypad above GLtron's joystick codes, so Configure Keys showed
+  blanks and "unknown custom key". `web/port/sdl_compat.c` names every key.
 - Touch controls queue key presses that are handled at the start of the next
   frame, exactly like real keys (`web_touch()` in `web/port/web.c`).
 
@@ -108,6 +112,8 @@ the tree still builds natively.
 A track is a file name, or `{ file: 'album/01-song.mp3', title: 'Song' }` to show a
 title in GLtron's Song menu (plain ASCII; the menu's font has nothing else).
 With more than one track, the game moves on to the next one when a song ends.
+`start: 'album/01-song.mp3'` opens every visit on that song, whatever the
+player picked last time.
 
 Then `GLTRON.setMuted(false)` turns sound on. Muting never changes the
 player's saved Music/FX settings. Without `music`, the page uses
@@ -130,7 +136,8 @@ On touch screens, on-screen controls appear by themselves and hide again when
 a keyboard is used (add `?touch=1` or `?touch=0` to the URL to force them):
 
 - **Racing:** tap the left or right half of the screen to turn, hold Boost
-  to boost. The corner buttons pause and open the menu.
+  to boost. The corner buttons change the camera view, pause, and open the
+  menu.
 - **Paused or round over:** tap anywhere to continue.
 - **Menus:** the arrow pad moves and changes values, OK selects, Back goes up
   a menu (or back to the race from the top menu).

@@ -31,7 +31,8 @@ EMSCRIPTEN_KEEPALIVE void web_set_muted(int muted) {
 enum {
   TOUCH_UP, TOUCH_DOWN, TOUCH_LEFT, TOUCH_RIGHT, /* menu navigation */
   TOUCH_OK, TOUCH_BACK, TOUCH_PAUSE,
-  TOUCH_TURN_LEFT, TOUCH_TURN_RIGHT, TOUCH_BOOST  /* the first human player */
+  TOUCH_TURN_LEFT, TOUCH_TURN_RIGHT, TOUCH_BOOST, /* the first human player */
+  TOUCH_CAMERA
 };
 
 extern void SystemQueueKey(int key, int state); /* nebu/base/system.c */
@@ -72,6 +73,7 @@ EMSCRIPTEN_KEEPALIVE void web_touch(int control, int down) {
   case TOUCH_TURN_LEFT: key = human_key("left"); break;
   case TOUCH_TURN_RIGHT: key = human_key("right"); break;
   case TOUCH_BOOST: key = human_key("boost"); break;
+  case TOUCH_CAMERA: key = SYSTEM_KEY_F10; break;   /* next camera view */
   default: return;
   }
   if(key)

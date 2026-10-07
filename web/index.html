@@ -81,12 +81,14 @@
   <symbol id="i-down" viewBox="0 0 24 24"><path d="m4 8 8 10 8-10z"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16v2.5H4zm0 4.75h16v2.5H4zM4 15.5h16V18H4z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M9 4 7.5 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5L15 4zm3 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2.2a2.3 2.3 0 1 0 0 4.6 2.3 2.3 0 0 0 0-4.6z"/></symbol>
 </svg>
 <div id="touch" hidden oncontextmenu="event.preventDefault()">
   <div class="steer left" data-on="game" data-touch="7"><svg><use href="#i-left"/></svg></div>
   <div class="steer right" data-on="game" data-touch="8"><svg><use href="#i-right"/></svg></div>
   <div class="tap" data-on="pause credits" data-touch="6">Tap to continue</div>
   <div class="corner" data-on="game pause">
+    <button class="camera" data-on="game pause" data-touch="10" aria-label="Camera view"><svg><use href="#i-camera"/></svg></button>
     <button class="pause" data-on="game" data-touch="6" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
     <button data-touch="5" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
   </div>

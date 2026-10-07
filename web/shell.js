@@ -9,7 +9,8 @@
 //     muted: false,         // start with all sound off
 //     maxPixelRatio: 2,     // cap on render resolution per CSS pixel
 //     music: { base: 'music/', tracks: ['song.mp3'] },  // else music/tracks.js
-//                           // tracks can also be { file: 'dir/song.mp3', title: 'Song' }
+//                           // tracks can also be { file: 'dir/song.mp3', title: 'Song' };
+//                           // start: 'dir/song.mp3' opens every visit on that track
 //     touch: 'auto',        // on-screen controls: true, false or 'auto'
 //                           // (?touch=1 / ?touch=0 in the URL also works)
 //     artpack: 'default',   // starting skin, if build.sh packaged it
@@ -120,6 +121,10 @@
 
     return {
       tracks: function () { return names.slice(); },
+      start: function () {
+        for (var i = 0; i < names.length; i++) if (files[names[i]] === cfg.start) return names[i];
+        return '';
+      },
       sync: function (name, playing, volume, loop) {
         want = { name: name, playing: playing, volume: volume, loop: loop };
         apply();
