@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "game/gltron.h"
 #include "game/timesystem.h"
 
@@ -40,10 +41,19 @@ void enterGame(void) { /* called when game mode is entered */
 
 void exitGame(void) {
   Audio_DisableEngine();
+  /* a camera key released on another screen never reaches keyGame */
+  gInput.cam_left = gInput.cam_right = gInput.cam_in = gInput.cam_out = 0;
   /* fprintf(stderr, "exit game\n"); */
 }
 
 void gameMouseMotion(int x, int y) {
+#ifdef __EMSCRIPTEN__
+  /* This mouse look measures each move from (MOUSE_ORIG_X, MOUSE_ORIG_Y)
+     and warps the pointer back there. A page can't move the pointer, so the
+     offsets would pile up and spin the camera. The arrow keys turn it
+     instead (keyGame). */
+  return;
+#endif
   if(x != MOUSE_ORIG_X || y != MOUSE_ORIG_Y) {
     gInput.mousex += x - MOUSE_ORIG_X;
     gInput.mousey += y - MOUSE_ORIG_Y;

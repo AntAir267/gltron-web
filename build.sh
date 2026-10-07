@@ -100,13 +100,22 @@ CFLAGS=("${COMMON[@]}" -std=gnu89)
 CXXFLAGS=("${COMMON[@]}" -std=gnu++98)
 
 objs=()
+# rebuild an object when its source or any header it included changed
+stale() { # src obj dep
+  [ -f "$2" ] && [ -f "$3" ] || return 0
+  local f
+  for f in "$1" $(sed -e 's/\\$//' -e 's/^[^:]*://' "$3"); do
+    [ "$f" -nt "$2" ] && return 0
+  done
+  return 1
+}
 compile() { # src obj
-  local src="$1" obj="$2"
-  if [ ! -f "$obj" ] || [ "$src" -nt "$obj" ]; then
+  local src="$1" obj="$2" dep="${2%.o}.d"
+  if stale "$src" "$obj" "$dep"; then
     mkdir -p "$(dirname "$obj")"
     case "$src" in
-      *.cpp) em++ "${CXXFLAGS[@]}" -c "$src" -o "$obj" ;;
-      *) emcc "${CFLAGS[@]}" -c "$src" -o "$obj" ;;
+      *.cpp) em++ "${CXXFLAGS[@]}" -MMD -MF "$dep" -c "$src" -o "$obj" ;;
+      *) emcc "${CFLAGS[@]}" -MMD -MF "$dep" -c "$src" -o "$obj" ;;
     esac
   fi
 }

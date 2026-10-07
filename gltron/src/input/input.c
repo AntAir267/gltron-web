@@ -1,5 +1,7 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "video/video.h"
 #include "game/game.h"
+#include "input/input.h"
 
 #include "Nebu_input.h"
 #include "Nebu_scripting.h"
@@ -45,8 +47,13 @@ void keyGame(int state, int k, int x, int y)
 		case SYSTEM_KEY_F11: doBmpScreenShot(gScreen); return;
 		case SYSTEM_KEY_F12: doPngScreenShot(gScreen); return;
 
+#ifdef __EMSCRIPTEN__
+		case SDLK_PAGEUP: consoleScrollBackward(1); return;
+		case SDLK_PAGEDOWN: consoleScrollForward(1); return;
+#else
 		case SYSTEM_KEY_UP: consoleScrollBackward(1); return;
 		case SYSTEM_KEY_DOWN: consoleScrollForward(1); return;
+#endif
     /* toggle lighting
   case SYSTEM_KEY_F6: 
       setSettingi("light_cycles", !game->settings->light_cycles);
@@ -114,6 +121,20 @@ void keyGame(int state, int k, int x, int y)
 			}
 		}
 	}
+#ifdef __EMSCRIPTEN__
+	/* arrow keys no player uses move the camera: Left/Right swing it around
+	   the bike, Up/Down zoom (browsers can't do GLtron's mouse look, see
+	   gameMouseMotion) */
+	{
+		int down = (state == SYSTEM_KEYSTATE_DOWN);
+		switch(k) {
+		case SYSTEM_KEY_LEFT: gInput.cam_left = down; return;
+		case SYSTEM_KEY_RIGHT: gInput.cam_right = down; return;
+		case SYSTEM_KEY_UP: gInput.cam_in = down; return;
+		case SYSTEM_KEY_DOWN: gInput.cam_out = down; return;
+		}
+	}
+#endif
 	if(state == SYSTEM_KEYSTATE_DOWN) {
 		displayMessage(TO_STDERR, "key '%s' (%d) is not bound", 
 									 SystemGetKeyName(k), k);
