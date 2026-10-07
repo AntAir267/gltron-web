@@ -39,6 +39,13 @@ EXTRA_ART="/path/to/myskin" ./build.sh
 Players switch skins in Video → Artpack; a page can pick the starting one
 (see `artpack` below).
 
+To replace the stock soundtrack with your own streamed playlist, point
+`MUSIC_JS` at a script that sets `window.GLTRON_MUSIC` (format below):
+
+```bash
+MUSIC_JS=/path/to/music.js EXTRA_ART="/path/to/myskin" ./build.sh
+```
+
 ## Layout
 
 | Path | What |
@@ -97,6 +104,10 @@ the tree still builds natively.
 </script>
 <script src="shell.js"></script>
 ```
+
+A track is a file name, or `{ file: 'album/01-song.mp3', title: 'Song' }` to show a
+title in GLtron's Song menu (plain ASCII; the menu's font has nothing else).
+With more than one track, the game moves on to the next one when a song ends.
 
 Then `GLTRON.setMuted(false)` turns sound on. Muting never changes the
 player's saved Music/FX settings. Without `music`, the page uses

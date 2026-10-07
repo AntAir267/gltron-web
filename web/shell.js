@@ -9,6 +9,7 @@
 //     muted: false,         // start with all sound off
 //     maxPixelRatio: 2,     // cap on render resolution per CSS pixel
 //     music: { base: 'music/', tracks: ['song.mp3'] },  // else music/tracks.js
+//                           // tracks can also be { file: 'dir/song.mp3', title: 'Song' }
 //     touch: 'auto',        // on-screen controls: true, false or 'auto'
 //                           // (?touch=1 / ?touch=0 in the URL also works)
 //     artpack: 'default',   // starting skin, if build.sh packaged it
@@ -65,22 +66,38 @@
   // player has interacted with the page, so retry on the first input.
   var music = (function () {
     var cfg = opts.music || window.GLTRON_MUSIC || { base: 'music/', tracks: [] };
+    var base = cfg.base ? cfg.base.replace(/\/?$/, '/') : '';
     var audio = new Audio();
     audio.preload = 'none';
     var want = { name: '', playing: false, volume: 0.5, loop: true };
     var loaded = '';
 
+    // GLtron knows each track by a name; its Song menu shows the name minus
+    // the extension. Names go into a Lua string and a file path, so keep them
+    // plain: no quotes, backslashes, slashes or line breaks.
+    var files = {};   // name -> file, relative to base
+    var names = [];
+    (cfg.tracks || []).forEach(function (t) {
+      var file = typeof t === 'string' ? t : t.file;
+      var name = typeof t === 'string' ? t : (t.title || '').replace(/["\\/\n\r]+/g, ' ').trim() + '.mp3';
+      if (!file || /["\\/\n\r]/.test(typeof t === 'string' ? t : '') || name === '.mp3') return;
+      for (var n = 2, unique = name; files[unique]; n++) unique = name.replace(/\.mp3$/, ' (' + n + ').mp3');
+      files[unique] = file;
+      names.push(unique);
+    });
+
     function apply() {
       if (want.name !== loaded) {
         loaded = want.name;
-        if (loaded) {
-          audio.src = cfg.base + encodeURIComponent(loaded);
+        if (files[loaded]) {
+          audio.src = base + files[loaded].split('/').map(encodeURIComponent).join('/');
         } else {
           audio.removeAttribute('src');
           audio.load();
         }
       }
-      audio.loop = want.loop;
+      // with several songs, play through them instead of repeating one
+      audio.loop = want.loop && names.length < 2;
       audio.volume = Math.max(0, Math.min(1, want.volume));
       audio.muted = muted;
       if (want.playing && loaded && document.visibilityState !== 'hidden') {
@@ -97,12 +114,12 @@
       }, true);
     });
     document.addEventListener('visibilitychange', apply);
+    audio.addEventListener('ended', function () {
+      if (ready && names.length > 1) Module._web_next_track();
+    });
 
     return {
-      // names go into a Lua string literal, so keep them plain
-      tracks: function () {
-        return (cfg.tracks || []).filter(function (n) { return !/["\\\n]/.test(n); });
-      },
+      tracks: function () { return names.slice(); },
       sync: function (name, playing, volume, loop) {
         want = { name: name, playing: playing, volume: volume, loop: loop };
         apply();

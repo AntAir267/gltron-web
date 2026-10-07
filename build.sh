@@ -8,6 +8,8 @@
 #
 # EXTRA_ART="dir ..." adds artpacks (folders shaped like gltron/art/default)
 # that live outside this repo, e.g. a site's own skin.
+# MUSIC_JS=file.js replaces the stock soundtrack with that playlist (it sets
+# window.GLTRON_MUSIC, see web/shell.js).
 #
 # Needs the Emscripten SDK (EMSDK env var, or ~/emsdk) and ffmpeg (with
 # libopenmpt, for the .it soundtrack).
@@ -149,6 +151,10 @@ done
 
 # music is streamed by the page, not packaged
 mkdir -p "$DIST/music"
+if [ -n "${MUSIC_JS:-}" ]; then
+  rm -f "$DIST"/music/*.mp3
+  cp "$MUSIC_JS" "$DIST/music/tracks.js"
+else
 tracks=()
 for f in "$G"/music/*.it; do
   mp3="$DIST/music/$(basename "${f%.*}").mp3"
@@ -159,6 +165,7 @@ for f in "$G"/music/*.it; do
 done
 printf 'window.GLTRON_MUSIC = { base: "music/", tracks: [%s] };\n' \
   "$(IFS=,; echo "${tracks[*]}")" > "$DIST/music/tracks.js"
+fi
 
 # ---- link --------------------------------------------------------------------
 rm -f "$DIST"/gltron.*
