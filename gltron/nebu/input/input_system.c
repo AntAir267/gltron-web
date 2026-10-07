@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "input/nebu_input_system.h"
 #include "input/nebu_system_keynames.h"
 #include "base/nebu_system.h"
@@ -41,8 +42,16 @@ void SystemMouseMotion(int x, int y) {
 }
 
 extern char* SystemGetKeyName(int key) {
+#ifdef __EMSCRIPTEN__
+	/* Emscripten's special keys (arrows, F-keys, keypad) are 1024 and up,
+	   above GLtron's joystick codes; SDL_GetKeyName (web/port/sdl_compat.c)
+	   names them */
+	if(key < SYSTEM_CUSTOM_KEYS || key >= 1024)
+		return (char*) SDL_GetKeyName(key);
+#else
 	if(key < SYSTEM_CUSTOM_KEYS)
 		return SDL_GetKeyName(key);
+#endif
 	else {
 		int i;
 		
