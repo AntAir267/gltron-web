@@ -1,4 +1,5 @@
 work/
 build/
 dist/
+ship.local
 .DS_Store
