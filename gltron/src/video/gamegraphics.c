@@ -1,3 +1,4 @@
+/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 /* Modified by Debian's gltron package patches (see patches/debian/). */
 #include "video/video.h"
 #include "game/game.h"
@@ -51,6 +52,7 @@ void drawGame(void) {
       glDepthMask(GL_FALSE);
       if (gSettingsCache.show_scores)
 				drawScore(p, d);
+      drawBoostMeter(p, pV, d);
       if (gSettingsCache.show_ai_status)
 				if(p->ai->active == AI_COMPUTER)
 					drawAI(d);
