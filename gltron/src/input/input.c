@@ -1,7 +1,6 @@
 /* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "video/video.h"
 #include "game/game.h"
-#include "input/input.h"
 
 #include "Nebu_input.h"
 #include "Nebu_scripting.h"
@@ -122,16 +121,32 @@ void keyGame(int state, int k, int x, int y)
 		}
 	}
 #ifdef __EMSCRIPTEN__
-	/* arrow keys no player uses move the camera: Left/Right swing it around
-	   the bike, Up/Down zoom (browsers can't do GLtron's mouse look, see
-	   gameMouseMotion) */
+	/* Keys no player has bound: the arrows also steer the first human player
+	   (Left/Right turn, Up boosts) and C cycles the camera like F10. */
 	{
-		int down = (state == SYSTEM_KEYSTATE_DOWN);
+		const char *action = NULL;
 		switch(k) {
-		case SYSTEM_KEY_LEFT: gInput.cam_left = down; return;
-		case SYSTEM_KEY_RIGHT: gInput.cam_right = down; return;
-		case SYSTEM_KEY_UP: gInput.cam_in = down; return;
-		case SYSTEM_KEY_DOWN: gInput.cam_out = down; return;
+		case SYSTEM_KEY_LEFT: action = "left"; break;
+		case SYSTEM_KEY_RIGHT: action = "right"; break;
+		case SYSTEM_KEY_UP: action = "boost"; break;
+		case 'c':
+			if(state == SYSTEM_KEYSTATE_DOWN)
+				nextCameraType();
+			return;
+		}
+		if(action) {
+			for(i = 0; i < game->players; i++) {
+				if(PLAYER_IS_ACTIVE(&game->player[i]) &&
+					 !game->player[i].ai->active) {
+					int key;
+					scripting_RunFormat("return settings.keys[%d].%s", i + 1, action);
+					scripting_GetIntegerResult(&key);
+					if(key != k)
+						keyGame(state, key, x, y);
+					break;
+				}
+			}
+			return;
 		}
 	}
 #endif

@@ -1,4 +1,3 @@
-/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #ifndef INPUT_H
 #define INPUT_H
 
@@ -7,11 +6,6 @@ typedef struct {
   int mouse2;
   int mousex;
   int mousey;
-  /* camera keys held down (web build: the arrow keys) */
-  int cam_left;
-  int cam_right;
-  int cam_in;
-  int cam_out;
 } Input;
 
 

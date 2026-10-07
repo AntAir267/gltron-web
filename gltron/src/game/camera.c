@@ -1,4 +1,3 @@
-/* Modified 2026-10 by Anthony Airdo for the web build (gltron-web). */
 #include "video/video.h"
 #include "input/input.h"
 
@@ -153,18 +152,7 @@ void playerCamera(PlayerVisual *pV, Player *p) {
       cam->movement[CAM_R] += (cam->movement[CAM_R]-CLAMP_R_MIN+1) * dt / 300.0f;
     if(gInput.mouse2 == 1)
       cam->movement[CAM_R] -= (cam->movement[CAM_R]-CLAMP_R_MIN+1) * dt / 300.0f;
-    /* camera keys (web build) zoom more gently than the mouse buttons */
-    if(gInput.cam_out)
-      cam->movement[CAM_R] += (cam->movement[CAM_R]-CLAMP_R_MIN+1) * dt / 1000.0f;
-    if(gInput.cam_in)
-      cam->movement[CAM_R] -= (cam->movement[CAM_R]-CLAMP_R_MIN+1) * dt / 1000.0f;
     writeCamDefaults(cam, CAM_R);
-  }
-
-  /* camera keys (web build): about half a turn per second */
-  if(cam->type.freedom[CAM_FREE_PHI] && gInput.cam_left != gInput.cam_right) {
-    cam->movement[CAM_PHI] += (gInput.cam_left ? 1 : -1) * 0.003f * dt;
-    writeCamDefaults(cam, CAM_PHI);
   }
 
   if(cam->type.freedom[CAM_FREE_PHI]) {
