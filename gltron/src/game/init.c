@@ -67,6 +67,9 @@ void initConfiguration(int argc, const char *argv[])
 	}
 		
 	setSettingf("version", 0.70f);
+#ifdef __EMSCRIPTEN__
+	scripting_Run("web_update_settings()");
+#endif
 
   /* parse any comandline switches overrinding the loaded settings */
   parse_args(argc, argv);

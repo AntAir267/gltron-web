@@ -68,6 +68,12 @@ void gameMouseMotion(int x, int y) {
 }
 
 void gameMouse(int buttons, int state, int x, int y) {
+#ifdef __EMSCRIPTEN__
+  /* Holding a mouse button zooms the camera. On a page, a click is how
+     people focus the game, and each one zoomed out by a third, so the web
+     build leaves the camera alone (like mouse look, see gameMouseMotion). */
+  return;
+#endif
   if(state == SYSTEM_MOUSEPRESSED) {
     if(buttons == SYSTEM_MOUSEBUTTON_LEFT) gInput.mouse1 = 1;
     if(buttons == SYSTEM_MOUSEBUTTON_RIGHT) gInput.mouse2 = 1;
