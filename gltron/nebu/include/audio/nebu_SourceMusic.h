@@ -1,3 +1,4 @@
+/* Modified 2026-11 by Anthony Airdo for the native build (gltron-web). */
 #ifndef NEBU_Sound_SourceMusic_H
 #define NEBU_Sound_SourceMusic_H
 
@@ -34,6 +35,7 @@ namespace Sound {
     int _buffersize;
     int _read;
     int _decoded;
+		int _ended; /* native build: the song is decoded, the buffer is draining */
 
 		char *_filename;
     SDL_RWops *_rwops;

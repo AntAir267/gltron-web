@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef GLTRON_NATIVE
+extern "C" int native_track_ended; /* src/audio/sound_glue.cpp */
+#endif
+
 namespace Sound {
   SourceMusic::SourceMusic(System *system) { 
     _system = system;
@@ -17,6 +21,7 @@ namespace Sound {
 
 		_decoded = 0;
     _read = 0;
+		_ended = 0;
 
     _filename = NULL;
     _rwops = NULL;
@@ -130,7 +135,17 @@ namespace Sound {
 	void SourceMusic::Idle(void) {
 		if(_sample == NULL)
 			return;
-		
+
+#ifdef GLTRON_NATIVE
+		if(_ended) {
+			/* play what's left in the buffer, then on to the next song */
+			if(_ended == 1 && (_decoded - _read + _buffersize) % _buffersize <= 8192) {
+				_ended = 2;
+				native_track_ended = 1;
+			}
+			return;
+		}
+#endif
 		// printf("idling\n");
 		while( _read == _decoded || 
 					 (_read - _decoded + _buffersize) % _buffersize >
@@ -154,6 +169,10 @@ namespace Sound {
 			// check for end of sample, loop
 			if((_sample->flags & SOUND_SAMPLEFLAG_ERROR) || 
 			   (_sample->flags & SOUND_SAMPLEFLAG_EOF)) {
+#ifdef GLTRON_NATIVE
+				_ended = 1;
+				return;
+#endif
 				// some error has occured, maybe end of sample reached
 #ifndef macintosh
 				SDL_SemWait(_sem);

@@ -12,6 +12,20 @@
 extern void SystemQueueKey(int key, int state); /* nebu/base/system.c */
 
 /* ---- paths ---- */
+static void read_default(const char *dir, const char *file, const char *env) {
+  char path[PATH_MAX], value[256];
+  FILE *f;
+  snprintf(path, sizeof(path), "%.*s/%s", PATH_MAX - 64, dir, file);
+  f = fopen(path, "r");
+  if(f) {
+    if(fgets(value, sizeof(value), f)) {
+      value[strcspn(value, "\r\n")] = 0;
+      setenv(env, value, 0);
+    }
+    fclose(f);
+  }
+}
+
 const char *native_data_dir(void) {
   static char dir[PATH_MAX];
   if(!dir[0]) {
@@ -28,18 +42,10 @@ const char *native_data_dir(void) {
       if(slash) *slash = 0;
       snprintf(dir, sizeof(dir), "%.*s/../share/gltron", PATH_MAX - 32, exe);
     }
-    /* a build's own default skin (ARTPACK in build.sh) */
-    {
-      char path[PATH_MAX], name[64];
-      FILE *f;
-      snprintf(path, sizeof(path), "%.*s/default_artpack", PATH_MAX - 32, dir);
-      f = fopen(path, "r");
-      if(f) {
-        if(fscanf(f, "%63s", name) == 1)
-          setenv("GLTRON_ARTPACK", name, 0);
-        fclose(f);
-      }
-    }
+    /* a build's own skin and main song (see build.sh) */
+    read_default(dir, "default_artpack", "GLTRON_ARTPACK");
+    read_default(dir, "default_track", "GLTRON_TRACK");
+    read_default(dir, "edition", "GLTRON_EDITION");
   }
   return dir;
 }
@@ -59,11 +65,17 @@ static void make_dirs(char *path) {
 const char *native_pref_dir(void) {
   static char dir[PATH_MAX];
   if(!dir[0]) {
+    /* an edition keeps its own settings, so its skin and songs stay its own */
     const char *xdg = getenv("XDG_DATA_HOME");
+    const char *edition;
+    char name[64];
+    native_data_dir();
+    edition = getenv("GLTRON_EDITION");
+    snprintf(name, sizeof(name), "gltron%s%.32s", edition ? "-" : "", edition ? edition : "");
     if(xdg && xdg[0] == '/')
-      snprintf(dir, sizeof(dir), "%.*s/gltron", PATH_MAX - 16, xdg);
+      snprintf(dir, sizeof(dir), "%.*s/%s", PATH_MAX - 80, xdg, name);
     else
-      snprintf(dir, sizeof(dir), "%.*s/.local/share/gltron", PATH_MAX - 32, getenv("HOME"));
+      snprintf(dir, sizeof(dir), "%.*s/.local/share/%s", PATH_MAX - 96, getenv("HOME"), name);
     make_dirs(dir);
   }
   return dir;

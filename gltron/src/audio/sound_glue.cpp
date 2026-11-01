@@ -4,6 +4,7 @@
 extern "C" {
 #include "game/game.h"
 #include "video/video.h" // 3d sound engine needs to know the camera's location!
+#include "scripting/nebu_scripting.h"
 }
 #include "audio/sound_glue.h"
 
@@ -21,6 +22,10 @@ static Sound::Source3D *recognizerEngine;
 
 #ifdef __EMSCRIPTEN__
 extern "C" int web_audio_muted; /* set by the host page, see web/port/web.c */
+#endif
+
+#ifdef GLTRON_NATIVE
+extern "C" { int native_track_ended = 0; } /* set by SourceMusic */
 #endif
 
 #define TURNLENGTH 250.0f
@@ -152,6 +157,14 @@ extern "C" {
     sound->SetMixFX(gSettingsCache.playEffects);
 #endif
     sound->Idle();
+#ifdef GLTRON_NATIVE
+    /* a song finished: on to the next, as the Song menu would (or from the
+       top of the same one, if it's the only one) */
+    if(native_track_ended) {
+      native_track_ended = 0;
+      scripting_Run("nextTrack()");
+    }
+#endif
   }
 
   void Audio_CrashPlayer(int player) {

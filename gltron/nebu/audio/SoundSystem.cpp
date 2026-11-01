@@ -1,3 +1,4 @@
+/* Modified 2026-11 by Anthony Airdo for the native build (gltron-web). */
 #include "audio/nebu_SoundSystem.h"
 
 #include <string.h>
@@ -47,10 +48,16 @@ namespace Sound {
 
   void System::AddSource(Source* source) { 
     List* p;
+#ifdef GLTRON_NATIVE
+    SDL_LockAudio(); /* the mixer runs on its own thread here */
+#endif
     for(p = & _sources; p->next != NULL; p = p->next);
+    p->data = source;
     p->next = new List;
     p->next->next = NULL;
-    p->data = source;
+#ifdef GLTRON_NATIVE
+    SDL_UnlockAudio();
+#endif
   }
 
   void System::Idle(void) {
@@ -61,9 +68,15 @@ namespace Sound {
 			// check if source is removable & has stopped playing
 			if(source->IsRemovable() && !source->IsPlaying()) {
 				// get rid of data
+#ifdef GLTRON_NATIVE
+				SDL_LockAudio();
+#endif
 				p->data = p->next->data;
 				List *tmp = p->next;
 				p->next = p->next->next;
+#ifdef GLTRON_NATIVE
+				SDL_UnlockAudio();
+#endif
 				delete tmp;
 				delete source;
 				if(p->next == NULL)

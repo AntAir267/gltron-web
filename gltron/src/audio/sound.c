@@ -140,6 +140,31 @@ void Sound_initTracks(void) {
     exit(1); // FIXME: handle missing songs somewhere else
   }
     
+#ifdef GLTRON_NATIVE
+  {
+    /* in a fixed order, starting on a build's main song (default_track in
+       native/port/native.c), like the site's player */
+    int n = 0, a, b;
+    List **all;
+    const char *start = getenv("GLTRON_TRACK");
+    for(p = soundList; p->next != NULL; p = p->next)
+      n++;
+    all = malloc(n * sizeof(List *));
+    n = 0;
+    for(p = soundList; p->next != NULL; p = p->next)
+      all[n++] = p;
+    for(a = 0; a < n; a++)
+      for(b = a + 1; b < n; b++)
+        if(strcmp((char *) all[a]->data, (char *) all[b]->data) > 0) {
+          void *t = all[a]->data;
+          all[a]->data = all[b]->data;
+          all[b]->data = t;
+        }
+    free(all);
+    if(start)
+      scripting_RunFormat("settings.current_track = \"%s\"", start);
+  }
+#endif
   i = 1;
   for(p = soundList; p->next != NULL; p = p->next) {
     

@@ -85,8 +85,10 @@ are fine):
 - `zlib/`, `libpng/`: their sources
 - `appimagetool-x86_64.AppImage`, `appimage-runtime-x86_64`
 
-and `ffmpeg` with libopenmpt. `EXTRA_ART="dir ..."` and `ARTPACK=name` add a skin
-and make it the default, as on the web.
+and `ffmpeg` with libopenmpt. A site or band can make its own edition, with its
+own skin, songs, icon and settings folder: `native/build.sh appimage edition`
+reads them from `native/edition.local` (not in git; the top of `build.sh` lists
+what it sets). Songs play in alphabetical order, each moving on to the next.
 
 `native/port/` is the only new code. `sdl1.c` provides the SDL 1.2 calls GLtron
 makes on top of SDL3, so the game's own code barely changes; `native.c` is the

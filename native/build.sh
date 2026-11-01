@@ -6,8 +6,18 @@
 #   native/build.sh            the game in build/native/AppDir
 #   native/build.sh appimage   and dist-native/GLtron-<version>-x86_64.AppImage
 #
-# EXTRA_ART="dir ..." adds artpacks from outside this repo, and ARTPACK=name
-# makes one the default.
+#   native/build.sh appimage edition
+#                              a build with its own skin and music, from
+#                              native/edition.local (not in git), which sets:
+#     EDITION=shortname        AppImage name and settings folder
+#     EDITION_NAME="Its Name"  in the desktop's menus
+#     ICON=file.png            square
+#     EXTRA_ART="dir ..."      artpacks from outside this repo
+#     ARTPACK=name             the one to start on
+#     MUSIC="file.mp3 ..."     in place of the stock soundtrack; name each file
+#                              as the Song menu should show it. They play in
+#                              alphabetical order and each start is on
+#     TRACK="file name.mp3"
 #
 # Needs, in native/third_party/ (not committed; symlinks are fine; README.md
 # has the details):
@@ -21,6 +31,11 @@ set -euo pipefail
 export LC_ALL=C
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+EDITION="" EDITION_NAME="GLtron" ICON="$ROOT/native/gltron-icon.png" MUSIC=() TRACK=""
+if [ "${2:-}" = edition ]; then
+  # shellcheck disable=SC1091
+  source "$ROOT/native/edition.local"
+fi
 TP="$ROOT/native/third_party"
 BUILD="$ROOT/build/native"
 JOBS="${JOBS:-6}"
@@ -134,7 +149,9 @@ rm "$D"/data/*.ogg
 for f in "$G"/data/*.wav; do
   ffmpeg -nostdin -loglevel error -y -i "$f" -ar 44100 -ac 2 -c:a pcm_s16le "$D/data/$(basename "$f")"
 done
-for f in "$G"/music/*.it; do
+# music in the mixer's format
+if [ ${#MUSIC[@]} = 0 ]; then MUSIC=("$G"/music/*.it); fi
+for f in "${MUSIC[@]}"; do
   mp3="$BUILD/music/$(basename "${f%.*}").mp3"
   if [ ! -f "$mp3" ] || [ "$f" -nt "$mp3" ]; then
     mkdir -p "$BUILD/music"
@@ -143,6 +160,8 @@ for f in "$G"/music/*.it; do
   cp "$mp3" "$D/music/"
 done
 [ -z "${ARTPACK:-}" ] || printf '%s\n' "$ARTPACK" > "$D/default_artpack"
+[ -z "$TRACK" ] || printf '%s\n' "$TRACK" > "$D/default_track"
+[ -z "$EDITION" ] || printf '%s\n' "$EDITION" > "$D/edition"
 
 # ---- AppImage ------------------------------------------------------------------
 [ "${1:-}" = appimage ] || { echo "built $A/usr/bin/gltron"; exit 0; }
@@ -169,20 +188,20 @@ HERE=$(dirname "$(readlink -f "$0")")
 exec "$HERE/usr/bin/gltron" "$@"
 EOT
 chmod +x "$A/AppRun"
-cat > "$A/gltron.desktop" <<'EOT'
+cat > "$A/gltron.desktop" <<EOT
 [Desktop Entry]
 Type=Application
-Name=GLtron
+Name=$EDITION_NAME
 Comment=Light cycle racing in 3D
 Exec=gltron
 Icon=gltron
 Categories=Game;ArcadeGame;
 StartupWMClass=gltron
 EOT
-cp "$ROOT/native/gltron-icon.png" "$A/gltron.png"
+cp "$ICON" "$A/gltron.png"
 OUT="$ROOT/dist-native"
 mkdir -p "$OUT"
 ARCH=x86_64 "$TP/appimagetool-x86_64.AppImage" --no-appstream --runtime-file "$TP/appimage-runtime-x86_64" \
-  "$A" "$OUT/GLtron-$VERSION-x86_64.AppImage" >/dev/null 2>"$BUILD/appimagetool.log" ||
+  "$A" "$OUT/GLtron${EDITION:+-$EDITION}-$VERSION-x86_64.AppImage" >/dev/null 2>"$BUILD/appimagetool.log" ||
   { tail -20 "$BUILD/appimagetool.log"; exit 1; }
-ls -la "$OUT/GLtron-$VERSION-x86_64.AppImage"
+ls -la "$OUT/GLtron${EDITION:+-$EDITION}-$VERSION-x86_64.AppImage"
