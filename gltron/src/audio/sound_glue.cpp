@@ -167,7 +167,11 @@ extern "C" {
     // output_decoders();
 
     SDL_AudioSpec* spec = new SDL_AudioSpec;
+#ifdef GLTRON_NATIVE
+    spec->freq = 44100; /* native/build.sh renders effects and music to this */
+#else
     spec->freq = 22050;
+#endif
     spec->format = AUDIO_S16SYS;
     spec->channels = 2;
     spec->samples = 1024;

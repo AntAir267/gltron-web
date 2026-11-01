@@ -61,9 +61,12 @@ function MainLoopReturned(status)
 			end
 		end
 	end
-	if(WEB) then
-		-- a page can be closed at any moment, so save on every screen change
+	if(WEB or NATIVE) then
+		-- a page or a Steam Deck game can be closed at any moment, so save on
+		-- every screen change
 		c_webSave()
+	end
+	if(WEB) then
 		SetCallback(callback)
 	end
 end

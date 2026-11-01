@@ -40,8 +40,17 @@ static void SystemPollEvents(void) {
 				SystemHandleInput(&event);
 				break;
 			case SDL_QUIT:
+#ifdef GLTRON_NATIVE
+				native_quit();
+#else
 				SystemExit();
+#endif
 				break;
+#ifdef GLTRON_NATIVE
+			case SDL_VIDEORESIZE:
+				native_resize(event.resize.w, event.resize.h);
+				break;
+#endif
 			default:
 				/* ignore event */
 				break;
@@ -53,9 +62,12 @@ static void SystemPollEvents(void) {
 EM_JS(void, web_screen_changed, (const char *name), {
   if (Module.onScreen) Module.onScreen(UTF8ToString(name));
 });
+#endif
 
-/* Keys from the page's touch controls (see web/port/web.c). They're
-   handled at the start of the next frame, like real key presses. */
+#ifdef GLTRON_PORT
+/* Keys from the page's touch controls (see web/port/web.c) or a controller
+   (native/port/native.c). They're handled at the start of the next frame,
+   like real key presses. */
 #define KEY_QUEUE_SIZE 32
 static int queued_keys[KEY_QUEUE_SIZE][2];
 static int queued_count = 0;
@@ -75,7 +87,9 @@ static void SystemDispatchQueuedKeys(void) {
     if(current && current->keyboard)
       current->keyboard(queued_keys[i][1], queued_keys[i][0], 0, 0);
 }
+#endif
 
+#ifdef __EMSCRIPTEN__
 /* The browser owns the loop: it calls SystemFrame once per animation frame.
    When a callback set asks to leave the loop (SystemExitLoop), main.lua's
    MainLoopReturned() picks the next one, as its while loop does natively. */
@@ -111,6 +125,9 @@ int SystemMainLoop() {
 	return_code = -1;
   while(return_code == -1) {
     SystemPollEvents();
+#ifdef GLTRON_NATIVE
+    SystemDispatchQueuedKeys();
+#endif
     if(redisplay) {
       current->display();
       redisplay = 0;

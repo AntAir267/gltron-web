@@ -1,3 +1,4 @@
+/* Modified 2026-11 by Anthony Airdo for the native build (gltron-web). */
 #include "audio/nebu_SourceMusic.h"
 
 #include <string.h>
@@ -109,9 +110,6 @@ namespace Sound {
 				_read = (_read + len) % _buffersize;
 			} else {
 				// wrap around in buffer
-				fprintf(stderr, "wrap around in buffer (%d, %d, %d)\n", 
-								len, _read, _buffersize);
-				
 				SDL_MixAudio(data, _buffer + _read, _buffersize - _read, volume);
 				len -= _buffersize - _read;
 				SDL_MixAudio(data + _buffersize - _read, _buffer, len, volume);

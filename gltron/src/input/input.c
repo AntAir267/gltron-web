@@ -46,7 +46,7 @@ void keyGame(int state, int k, int x, int y)
 		case SYSTEM_KEY_F11: doBmpScreenShot(gScreen); return;
 		case SYSTEM_KEY_F12: doPngScreenShot(gScreen); return;
 
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
 		case SDLK_PAGEUP: consoleScrollBackward(1); return;
 		case SDLK_PAGEDOWN: consoleScrollForward(1); return;
 #else
@@ -120,7 +120,7 @@ void keyGame(int state, int k, int x, int y)
 			}
 		}
 	}
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
 	/* Keys no human player has bound: the arrows and GLtron's classic
 	   player 1 letters (A/S turn, E boosts) steer the first human player,
 	   and C cycles the camera like F10. */

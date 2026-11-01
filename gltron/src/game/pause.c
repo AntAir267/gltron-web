@@ -35,7 +35,7 @@ void keyboardPause(int state, int key, int x, int y) {
   case SYSTEM_KEY_F5: saveSettings(); break;
 
   case SYSTEM_KEY_F10: nextCameraType(); break;
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
   case 'c': nextCameraType(); break; /* as in the race (keyGame) */
 #endif
 

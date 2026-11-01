@@ -15,7 +15,11 @@ char *credits[] = {
   "              Tyler Esselstrom       Allen Bond",
   " Music:       Peter Hajba",
   " Sound:       Damon Law",
+  #ifdef GLTRON_NATIVE
+  " Linux port:  Anthony Airdo",
+#else
   " Web port:    Anthony Airdo",
+#endif
   "",
   "Additional Thanks to:",
   "Xavier Bouchoux     Mike Field      Steve Baker",
@@ -28,7 +32,7 @@ char *credits[] = {
   "Thanks to my sponsors:",
   "  3dfx:              Voodoo5 5500 graphics card",
   "  Right Hemisphere:  3D exploration software",
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
   "",
   "Source: github.com/AntAir267/gltron-web",
 #endif

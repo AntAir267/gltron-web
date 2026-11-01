@@ -3,3 +3,5 @@ build/
 dist/
 ship.local
 .DS_Store
+native/third_party/
+dist-native/

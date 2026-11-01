@@ -331,7 +331,12 @@ void drawCam(Player *p, PlayerVisual* pV) {
 	
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
+#ifdef GLTRON_NATIVE
+  /* a real ratio, for 16:10 and wider screens (this divides integers below) */
+  doPerspective(gSettingsCache.fov, (float) d->vp_w / d->vp_h,
+#else
   doPerspective(gSettingsCache.fov, d->vp_w / d->vp_h,
+#endif
                 gSettingsCache.znear, game2->rules.grid_size * 6.5f);
 
   glMatrixMode(GL_MODELVIEW);

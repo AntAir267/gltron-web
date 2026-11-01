@@ -78,6 +78,14 @@ settings.screenSaver = 0
 
 settings.joy_threshold = 0.10
 
+if(NATIVE) then
+	settings.use_stencil = 1
+	settings.windowMode = 0 -- fullscreen; Video > Windowed in the menu
+	if(getenv("GLTRON_ARTPACK")) then
+		settings.current_artpack = getenv("GLTRON_ARTPACK")
+	end
+end
+
 if(WEB) then
 	-- WebGL always has a stencil buffer, so shadows can be translucent
 	settings.use_stencil = 1
@@ -153,6 +161,28 @@ if(WEB) then
 	settings.keys[4].glance_left = 1119 -- keypad 7
 	settings.keys[4].glance_right = 1121 -- keypad 9
 	settings.keys[4].boost = 1117 -- keypad 5
+end
+
+if(NATIVE) then
+	-- as on the web: player 1 gets the arrow keys, player 3 the letters (the
+	-- native build keeps SDL 1.2's key numbers, native/port/sdl1.c)
+	settings.keys[1] = {
+		left = 276, -- cursor left
+		right = 275, -- cursor right
+		glance_left = 127, -- 'del'
+		glance_right = 279, -- 'end'
+		boost = 273, -- cursor up
+	}
+	settings.keys[3] = {
+		left = 97, -- lower case 'a'
+		right = 115, -- lower case 's'
+		glance_left = 113, -- lower case 'q'
+		glance_right = 119, -- lower case 'w'
+		boost = 101, -- lower case 'e'
+	}
+end
+
+if(WEB or NATIVE) then
 	web_default_keys = settings.keys
 
 	-- game type "both": the booster and wall acceleration

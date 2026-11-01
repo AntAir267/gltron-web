@@ -67,7 +67,7 @@ void initConfiguration(int argc, const char *argv[])
 	}
 		
 	setSettingf("version", 0.70f);
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
 	scripting_Run("web_update_settings()");
 #endif
 

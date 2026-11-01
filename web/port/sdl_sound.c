@@ -27,12 +27,43 @@ static Uint32 le32(const Uint8 *p) {
 }
 static Uint16 le16(const Uint8 *p) { return p[0] | (p[1] << 8); }
 
+#ifdef GLTRON_NATIVE
+/* The native build streams music itself: MP3s, in the mixer's format
+   (native/build.sh renders them that way). */
+#define DR_MP3_IMPLEMENTATION
+#include "../../native/port/dr_mp3.h"
+
+Sound_Sample *Sound_NewSample(SDL_RWops *rw, const char *ext,
+                              Sound_AudioInfo *desired, Uint32 bufferSize) {
+  Sound_Sample *sample;
+  drmp3 *mp3 = malloc(sizeof(drmp3));
+
+  if(!drmp3_init_file(mp3, rw->path, NULL)) {
+    free(mp3);
+    error = "can't open MP3";
+    return NULL;
+  }
+  if(desired && (mp3->channels != desired->channels || mp3->sampleRate != desired->rate))
+    fprintf(stderr, "[sound] %s is %d ch / %d Hz, the mixer wants %d / %d\n", rw->path,
+            mp3->channels, mp3->sampleRate, desired->channels, desired->rate);
+  sample = calloc(1, sizeof(Sound_Sample));
+  sample->opaque = mp3;
+  sample->actual.format = AUDIO_S16LSB;
+  sample->actual.channels = mp3->channels;
+  sample->actual.rate = mp3->sampleRate;
+  sample->desired = desired ? *desired : sample->actual;
+  sample->buffer = malloc(bufferSize);
+  sample->buffer_size = bufferSize;
+  return sample;
+}
+#else
 Sound_Sample *Sound_NewSample(SDL_RWops *rw, const char *ext,
                               Sound_AudioInfo *desired, Uint32 bufferSize) {
   /* Emscripten's SDL_RWops can't be read from C */
   error = "Sound_NewSample: use Sound_NewSampleFromFile";
   return NULL;
 }
+#endif
 
 Sound_Sample *Sound_NewSampleFromFile(const char *filename,
                                       Sound_AudioInfo *desired,
@@ -112,10 +143,28 @@ Sound_Sample *Sound_NewSampleFromFile(const char *filename,
 void Sound_FreeSample(Sound_Sample *sample) {
   if(sample == NULL)
     return;
+#ifdef GLTRON_NATIVE
+  if(sample->opaque) {
+    drmp3_uninit(sample->opaque);
+    free(sample->opaque);
+  }
+#endif
   free(sample->buffer);
   free(sample);
 }
 
-/* the whole file is decoded on load */
-Uint32 Sound_Decode(Sound_Sample *sample) { return 0; }
+/* the whole file is decoded on load, except native music */
+Uint32 Sound_Decode(Sound_Sample *sample) {
+#ifdef GLTRON_NATIVE
+  if(sample->opaque) {
+    drmp3 *mp3 = sample->opaque;
+    drmp3_uint64 frames = sample->buffer_size / (2 * mp3->channels);
+    drmp3_uint64 got = drmp3_read_pcm_frames_s16(mp3, frames, sample->buffer);
+    if(got < frames)
+      sample->flags = SOUND_SAMPLEFLAG_EOF;
+    return (Uint32) (got * 2 * mp3->channels);
+  }
+#endif
+  return 0;
+}
 Uint32 Sound_DecodeAll(Sound_Sample *sample) { return sample->buffer_size; }

@@ -36,6 +36,30 @@ void drawGuiBackground(void) {
   glColor3f(1.0, 1.0, 1.0);
   glBegin(GL_QUADS);
 
+#ifdef GLTRON_NATIVE
+  {
+    /* the art is 4:3: on other screens fill the screen and crop, not stretch */
+    float aspect = (float) gScreen->vp_w / gScreen->vp_h;
+    float u0 = 0, u1 = 1, v0 = 0, v1 = .75f;
+    if(aspect > 4.0f / 3.0f) {
+      float cut = .75f * (1 - (4.0f / 3.0f) / aspect) / 2;
+      v0 += cut;
+      v1 -= cut;
+    } else {
+      float cut = (1 - aspect / (4.0f / 3.0f)) / 2;
+      u0 += cut;
+      u1 -= cut;
+    }
+    glTexCoord2f(u0, v0);
+    glVertex2f(0, 0);
+    glTexCoord2f(u1, v0);
+    glVertex2i(gScreen->vp_w, 0);
+    glTexCoord2f(u1, v1);
+    glVertex2i(gScreen->vp_w, gScreen->vp_h);
+    glTexCoord2f(u0, v1);
+    glVertex2i(0, gScreen->vp_h);
+  }
+#else
   glTexCoord2f(0.0, 0.0);
   glVertex2f(0, 0);
 
@@ -47,6 +71,7 @@ void drawGuiBackground(void) {
 
   glTexCoord2f(0.0, .75);
   glVertex2i(0, gScreen->vp_h);
+#endif
 
   glEnd();
 }
@@ -61,10 +86,21 @@ void drawGuiLogo(void) {
   
   rasonly(gScreen);
 
+#ifdef GLTRON_NATIVE
+  {
+    /* keep the logo's shape, in the same corner, on any screen */
+    float scale = gScreen->vp_h / 384.0f;
+    pos[0] = gScreen->vp_w - (512 - pos[0]) * scale;
+    pos[1] *= scale;
+    size[0] *= scale;
+    size[1] *= scale;
+  }
+#else
   pos[0] *= gScreen->vp_w / 512.0f;
   pos[1] *= gScreen->vp_h / 384.0f;
   size[0] *= gScreen->vp_w / 512.0f;
   size[1] *= gScreen->vp_h / 384.0f;
+#endif
   glpos *= gScreen->vp_w / 512.0f;
   glsize *= gScreen->vp_w / 512.0f;
   

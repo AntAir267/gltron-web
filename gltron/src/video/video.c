@@ -1,3 +1,4 @@
+/* Modified 2026-11 by Anthony Airdo for the native build (gltron-web). */
 #include "video/video.h"
 #include "game/game.h"
 #include "filesystem/path.h"
@@ -187,14 +188,16 @@ void resetVideoData(void) {
 }
 
 void initDisplay(Visual *d, int type, int p, int onScreen) {
-  int field;
-  field = gScreen->vp_w / 32;
+  /* the layouts are in units of 1/32 of the width and 1/24 of the height, the
+     same on the 4:3 screens they were written for and fitting any other */
+  float field = gScreen->vp_w / 32.0f;
+  float field_y = gScreen->vp_h / 24.0f;
   d->h = gScreen->h;
   d->w = gScreen->w;
   d->vp_x = gScreen->vp_x + vp_x[type][p] * field;
-  d->vp_y = gScreen->vp_y + vp_y[type][p] * field;
+  d->vp_y = gScreen->vp_y + vp_y[type][p] * field_y;
   d->vp_w = vp_w[type][p] * field;
-  d->vp_h = vp_h[type][p] * field;
+  d->vp_h = vp_h[type][p] * field_y;
   d->onScreen = onScreen;
 }  
 

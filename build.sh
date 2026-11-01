@@ -106,7 +106,7 @@ INCLUDES=(
 )
 DEFINES=(
   -DDATA_DIR='"/gltron"' -DPREF_DIR='"/prefs"' -DSNAP_DIR='"/prefs"'
-  -DSEPARATOR="'/'" -DVERSION='"0.70-web"'
+  -DSEPARATOR="'/'" -DVERSION='"0.70-web"' -DGLTRON_PORT
 )
 PORTS=(-sUSE_SDL=1 -sUSE_LIBPNG=1 -sUSE_ZLIB=1)
 

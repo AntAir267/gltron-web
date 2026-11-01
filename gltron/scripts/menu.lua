@@ -574,6 +574,13 @@ Menu.ScreenMenu.items = {
 
 Menu.AudioMenu.items = { "Music", "FX", "Music_Volume", "FX_Volume", "Song" }
 
+if(NATIVE) then
+	Menu.VideoMenu.items = { "Artpack", "DetailsMenu", "WindowMode" }
+	-- controllers go through native/port/pad.c, not GLtron's joystick code
+	Menu.GameMenu.items = { "StartGame", "ResetScores", "GameRulesMenu",
+		"GameSettingsMenu", "PlayerConfigMenu", "KeyConfigMenu" }
+end
+
 -- initialization code
 Menu.SetNames()
 Menu.SetParent( "RootMenu" )

@@ -69,6 +69,63 @@ EXTRA_ART=../mysite/gltron/myskin
 SHIP="python3 ../mysite/tools/ship-game.py gltron"
 ```
 
+## Linux and Steam Deck
+
+`native/build.sh appimage` builds the same game as a native Linux AppImage
+(`dist-native/GLtron-<version>-x86_64.AppImage`, about 16 MB): real OpenGL
+instead of gl4es, music decoded by the game instead of an `<audio>` element.
+Everything is compiled with Zig for glibc 2.31, so it runs on Linux from 2020 on,
+including SteamOS. It needs, in `native/third_party/` (not committed, symlinks
+are fine):
+
+- `zig-x86_64-linux-0.17.0/`: the official Zig build
+- `sdl3-rel/`: SDL3 built with that Zig as a static library, for
+  `x86_64-linux-gnu.2.31`, with its source folder `SDL3-*` beside it (for the
+  licence)
+- `zlib/`, `libpng/`: their sources
+- `appimagetool-x86_64.AppImage`, `appimage-runtime-x86_64`
+
+and `ffmpeg` with libopenmpt. `EXTRA_ART="dir ..."` and `ARTPACK=name` add a skin
+and make it the default, as on the web.
+
+`native/port/` is the only new code. `sdl1.c` provides the SDL 1.2 calls GLtron
+makes on top of SDL3, so the game's own code barely changes; `native.c` is the
+link to the game (paths, window size, what a controller does on each screen);
+`pad.c` reads the controllers. Settings and F12 screenshots go to
+`~/.local/share/gltron`, saved on every screen change and on exit.
+
+It starts fullscreen (Video > Windowed in the menu) at the screen's own
+resolution. Layouts fill any shape of screen, the picture has the true aspect
+ratio (the web build keeps GLtron's integer division, see `drawCam`), and the 4:3
+menu art is cropped to fit instead of stretched.
+
+**Controllers:** every controller drives player 1, in any order, plugged in
+before or after the game starts, with the keyboard working alongside. In a game
+with several human players (Game > Configure Players), each controller takes the
+next human the first time it is pressed. Back in the menus they're all player
+1's again.
+
+| | In the race | Menus |
+|---|---|---|
+| D-pad / left stick | left, right turn; D-pad up boosts | move, change sliders |
+| LB, RB | turn | |
+| A, X, LT, RT | boost | A selects |
+| B | | back |
+| Y | next camera view | |
+| Right stick | glance left, right | |
+| Start | pause (A or Start continues) | back |
+| Back | menu | back |
+
+Controller buttons can't be rebound yet; Configure Keys is for keyboards, and B
+cancels it.
+
+**Tests:** `GLTRON_TEST=file` runs a script of timed controller, key and
+screenshot steps through SDL's own virtual gamepads (the format is in `pad.c`).
+Run it under `gamescope --backend headless -w 1280 -h 800` for a Deck-sized screen
+and no window, with `SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS=1`. A virtual trigger
+rests at -32768 and a stick's first report counts as its rest position, so send
+those first; saving a screenshot stalls a frame or two, so leave 200 ms after it.
+
 ## Layout
 
 | Path | What |
@@ -78,11 +135,12 @@ SHIP="python3 ../mysite/tools/ship-game.py gltron"
 | `web/port/` | Web-only C/C++: SDL_sound stand-in, missing SDL 1.2 calls, streamed-music `SourceMusic`, page entry points |
 | `web/index.html`, `web/shell.js` | The page: canvas sizing, loading bar, saved settings, music player, mute |
 | `build.sh` | Builds gl4es, compiles everything, packages game data, renders music |
+| `native/` | The Linux and Steam Deck build: SDL3 layer, controllers, AppImage script |
 
 ## Changes to GLtron
 
-All web-only changes are behind `#ifdef __EMSCRIPTEN__` or `if(WEB)` in Lua, so
-the tree still builds natively.
+Changes are behind `#ifdef __EMSCRIPTEN__` or `if(WEB)` in Lua, `GLTRON_NATIVE`
+or `if(NATIVE)` for the Linux build, and `GLTRON_PORT` where both share one.
 
 - **Main loop.** Browsers own the loop, so `SystemMainLoop` registers a
   per-frame callback instead of blocking, and `main.lua`'s

@@ -32,6 +32,13 @@ int c_webSave(lua_State *L) {
 }
 #endif
 
+#ifdef GLTRON_NATIVE
+int c_webSave(lua_State *L) {
+  saveSettings();
+  return 0;
+}
+#endif
+
 int c_quitGame(lua_State *L) {
   saveSettings();
 	SystemExitLoop(RETURN_CREDITS);
@@ -162,5 +169,9 @@ void init_c_interface(void) {
 	scripting_Register("c_webQuit", c_webQuit);
 	scripting_Register("c_webSave", c_webSave);
 	scripting_Run("WEB = 1");
+#endif
+#ifdef GLTRON_NATIVE
+	scripting_Register("c_webSave", c_webSave);
+	scripting_Run("NATIVE = 1");
 #endif
 }

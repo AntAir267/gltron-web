@@ -45,7 +45,7 @@ void exitGame(void) {
 }
 
 void gameMouseMotion(int x, int y) {
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
   /* This mouse look measures each move from (MOUSE_ORIG_X, MOUSE_ORIG_Y)
      and warps the pointer back there. A page can't move the pointer, so the
      offsets would pile up and spin the camera; C cycles camera views
@@ -68,7 +68,7 @@ void gameMouseMotion(int x, int y) {
 }
 
 void gameMouse(int buttons, int state, int x, int y) {
-#ifdef __EMSCRIPTEN__
+#ifdef GLTRON_PORT
   /* Holding a mouse button zooms the camera. On a page, a click is how
      people focus the game, and each one zoomed out by a third, so the web
      build leaves the camera alone (like mouse look, see gameMouseMotion). */
