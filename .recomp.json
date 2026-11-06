@@ -1,0 +1,32 @@
+{
+  "$schema": "https://recomp.fyi/schema/v1.json",
+  "game": "GLtron",
+  "system": "PC (Linux)",
+  "type": "port",
+  "project": "GLtron web and native port",
+  "status": "released",
+  "targets": [
+    "Web",
+    "Linux",
+    "Steam Deck"
+  ],
+  "toolchain": [
+    "Emscripten",
+    "gl4es"
+  ],
+  "approach": "GLtron 0.70's released source built for WebAssembly with Emscripten and gl4es (original game, menus and 3D sound in a browser), plus a native Linux/Steam Deck build.",
+  "started": "2026-10-05",
+  "maintainers": [
+    {
+      "name": "AntAir267",
+      "link": "https://github.com/AntAir267"
+    }
+  ],
+  "links": [
+    {
+      "label": "Play in the browser",
+      "url": "https://thegrandpricks.com/games/gltron/"
+    }
+  ],
+  "notes": "Built from the authors' own GPL source release; no game data needs to be supplied."
+}
