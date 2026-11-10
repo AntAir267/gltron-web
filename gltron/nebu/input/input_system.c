@@ -22,11 +22,19 @@ void SystemWarpPointer(int x, int y) {
 }
 
 void SystemHidePointer() {
+#ifndef __EMSCRIPTEN__
   SDL_ShowCursor(SDL_DISABLE);
+#endif
 }
 
 void SystemUnhidePointer() {
+#ifndef __EMSCRIPTEN__
+  /* Emscripten's SDL_ShowCursor(SDL_ENABLE) calls document.exitPointerLock(),
+     which iPhone and iPad browsers don't have: the menu's first frame threw and
+     left a black page. The web build never locks the pointer anyway (hiding it
+     only locks it in fullscreen, and the game doesn't go fullscreen). */
   SDL_ShowCursor(SDL_ENABLE);
+#endif
 }
 
 void SystemMouse(int buttons, int state, int x, int y) {

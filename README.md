@@ -175,6 +175,9 @@ or `if(NATIVE)` for the Linux build, and `GLTRON_PORT` where both share one.
 - **Key names:** Emscripten's SDL only names a-z and 0-9, and numbers arrows,
   F-keys and the keypad above GLtron's joystick codes, so Configure Keys showed
   blanks and "unknown custom key". `web/port/sdl_compat.c` names every key.
+- **No cursor calls on the web.** Emscripten's `SDL_ShowCursor(SDL_ENABLE)` calls
+  `document.exitPointerLock()`, which iPhones and iPads don't have, so the menu's
+  first frame threw and left a black page. The pointer is never locked anyway.
 - Touch controls queue key presses that are handled at the start of the next
   frame, exactly like real keys (`web_touch()` in `web/port/web.c`).
 - **Game type "both"** (booster and wall acceleration) is the default;
